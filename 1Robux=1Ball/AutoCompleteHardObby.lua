@@ -109,11 +109,12 @@ task.spawn(function()
 			if CodeRanned == true then
 				CodeRanned = false
 				--------------------------Best robust working code
-				game.Players.LocalPlayer.Character.HumanoidRootPart.Position = Vector3.new(-924,1274,1195)
+				
+				game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position = Vector3.new(-924,1274,1195)
 				task.wait(1)
-				game.Players.LocalPlayer.Character.HumanoidRootPart.Position = Vector3.new(-924,1272,1195)
+				game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position = Vector3.new(-924,1272,1195)
 				task.wait(1)
-				game.Players.LocalPlayer.Character.HumanoidRootPart.Position = Vector3.new(-924,1276,1195)
+				game.Players.LocalPlayer.Character:WaitForChild("HumanoidRootPart").Position = Vector3.new(-924,1276,1195)
 				task.wait(4)
 				local found = false
 				for i,v in workspace:GetDescendants() do
