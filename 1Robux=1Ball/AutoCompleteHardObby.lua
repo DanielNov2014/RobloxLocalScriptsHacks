@@ -2,9 +2,13 @@
 -- Version: 3.2
 
 -- Instances:
-if game.Players.LocalPlayer.PlayerGui["Scriptforgame_1_Robux_=_1_ball"] then
+local Scriptforgame_1_Robux__1_ball = Instance.new("ScreenGui")
+Scriptforgame_1_Robux__1_ball.Name = "Scriptforgame_1_Robux_=_1_ball"
+Scriptforgame_1_Robux__1_ball.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+Scriptforgame_1_Robux__1_ball.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+Scriptforgame_1_Robux__1_ball.ResetOnSpawn = false
+if game.Players.LocalPlayer.PlayerGui:FindFirstChild("Scriptforgame_1_Robux_=_1_ball") then
 	game.Players.LocalPlayer.PlayerGui["Scriptforgame_1_Robux_=_1_ball"]:Destroy()
-	
 end
 local Scriptforgame_1_Robux__1_ball = Instance.new("ScreenGui")
 local Draggble = Instance.new("Frame")
