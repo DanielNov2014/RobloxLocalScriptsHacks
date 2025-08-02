@@ -230,7 +230,9 @@ local function UpdatePlayerlist()
 end
 
 UpdatePlayerlist()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
+task.spawn(function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
+end)
 slap.MouseButton1Click:Connect(function()
 	if player then
 		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
@@ -311,3 +313,4 @@ end)
 while task.wait(10) do
 	UpdatePlayerlist()
 end
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
