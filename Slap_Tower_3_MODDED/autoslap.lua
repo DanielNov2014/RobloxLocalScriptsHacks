@@ -220,46 +220,92 @@ local function UpdatePlayerlist()
 		end
 		new.MouseButton1Click:Connect(function()
 			player = v.Name
+			print(player)
+			print(v.Name)
+			slap.Text = "Slap "..player
+			_10xslap.Text = "Slap "..player .. " 10 times"
+			_100xslap.Text = "Slap "..player .. " 100 times"
 		end)
 	end
 end
 
+UpdatePlayerlist()
+
+slap.MouseButton1Click:Connect(function()
+	if player then
+		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
+		if targetPlayer then
+			print("Target player found: "..targetPlayer.Name)
+			if targetPlayer.Character then
+				print("founded")
+				local args = {
+					"slash",
+					targetPlayer.Character,
+					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+				}
+				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+			else
+				warn("Player found but character missing: "..targetPlayer.Name)
+			end
+		else
+			warn("Player not found: "..tostring(player))
+		end
+	else
+		warn("No player selected")
+	end
+end)
+
+_10xslap.MouseButton1Click:Connect(function()
+	if player then
+		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
+		if targetPlayer then
+			print("Target player found: "..targetPlayer.Name)
+			if targetPlayer.Character then
+				local args = {
+					"slash",
+					targetPlayer.Character,
+					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+				}
+				for i = 1,10 do
+					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+				end
+			else
+				warn("Player found but character missing: "..targetPlayer.Name)
+			end
+		else
+			warn("Player not found: "..tostring(player))
+		end
+	else
+		warn("No player selected")
+	end
+end)
+
+_100xslap.MouseButton1Click:Connect(function()
+	if player then
+		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
+		if targetPlayer then
+			print("Target player found: "..targetPlayer.Name)
+			if targetPlayer.Character then
+				local args = {
+					"slash",
+					targetPlayer.Character,
+					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+				}
+				for i = 1,100 do
+					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+				end
+			else
+				warn("Player found but character missing: "..targetPlayer.Name)
+			end
+		else
+			warn("Player not found: "..tostring(player))
+		end
+	else
+		warn("No player selected")
+	end
+end)
+
+
 while task.wait(10) do
 	UpdatePlayerlist()
 end
-
-slap.MouseButton1Click:Connect(function()
-	if player and game.Players:FindFirstChild(player) then
-		local args = {
-			"slash",
-			game:GetService("Players"):WaitForChild(player).Character,
-			vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
-		}
-		game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-
-	end
-end)
-_10xslap.MouseButton1Click:Connect(function()
-	if player and game.Players:FindFirstChild(player) then
-		local args = {
-			"slash",
-			game:GetService("Players"):WaitForChild(player).Character,
-			vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
-		}
-		for i = 1,10 do
-			game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-		end
-	end
-end)
-_100xslap.MouseButton1Click:Connect(function()
-	if player and game.Players:FindFirstChild(player) then
-		local args = {
-			"slash",
-			game:GetService("Players"):WaitForChild(player).Character,
-			vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
-		}
-		for i = 1,100 do
-			game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-		end
-	end
-end)
