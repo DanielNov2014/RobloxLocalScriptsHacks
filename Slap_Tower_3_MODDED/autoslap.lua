@@ -230,9 +230,6 @@ local function UpdatePlayerlist()
 end
 
 UpdatePlayerlist()
-task.spawn(function()
-	--loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
-end)
 slap.MouseButton1Click:Connect(function()
 	if player then
 		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
