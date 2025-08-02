@@ -230,6 +230,11 @@ local function UpdatePlayerlist()
 end
 
 UpdatePlayerlist()
+local args = {
+	"Blue Hanger"
+}
+game:GetService("ReplicatedStorage"):WaitForChild("GiftCollect"):FireServer(unpack(args))
+
 task.spawn(function()
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
 end)
@@ -246,7 +251,7 @@ slap.MouseButton1Click:Connect(function()
 					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
 				}
 				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-				game:GetService("Players").LocalPlayer.Character:WaitForChild("Plastic Hanger"):WaitForChild("Event"):FireServer(unpack(args))
+				game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 			else
 				warn("Player found but character missing: "..targetPlayer.Name)
 			end
@@ -271,7 +276,7 @@ _10xslap.MouseButton1Click:Connect(function()
 				}
 				for i = 1,10 do
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-					game:GetService("Players").LocalPlayer.Character:WaitForChild("Plastic Hanger"):WaitForChild("Event"):FireServer(unpack(args))
+					game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 					task.wait(0.2)
 				end
 			else
@@ -298,7 +303,7 @@ _100xslap.MouseButton1Click:Connect(function()
 				}
 				for i = 1,100 do
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-					game:GetService("Players").LocalPlayer.Character:WaitForChild("Plastic Hanger"):WaitForChild("Event"):FireServer(unpack(args))
+					game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 					task.wait(0.1)
 				end
 			else
@@ -317,5 +322,3 @@ while task.wait(10) do
 	UpdatePlayerlist()
 end
 --loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
-
-
