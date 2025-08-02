@@ -34,8 +34,8 @@ Draggble.Parent = Slap
 Draggble.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
 Draggble.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Draggble.BorderSizePixel = 0
-Draggble.Position = UDim2.new(0.615900397, 0, 0.270664513, 0)
-Draggble.Size = UDim2.new(0.33141762, 0, 0.0972447321, 0)
+Draggble.Position = UDim2.new(0.215187952, 0, 0.229067177, 0)
+Draggble.Size = UDim2.new(0.732129991, 0, 0.138842076, 0)
 
 UICorner.CornerRadius = UDim.new(1, 8)
 UICorner.Parent = Draggble
@@ -45,7 +45,7 @@ ScrollingFrame.Active = true
 ScrollingFrame.BackgroundColor3 = Color3.fromRGB(57, 57, 57)
 ScrollingFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 ScrollingFrame.BorderSizePixel = 0
-ScrollingFrame.Position = UDim2.new(0, 0, 0.5, 0)
+ScrollingFrame.Position = UDim2.new(0, 0, 0.547936499, 0)
 ScrollingFrame.Size = UDim2.new(1, 0, 5, 0)
 ScrollingFrame.ScrollBarThickness = 30
 
@@ -54,15 +54,15 @@ Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 Frame.BackgroundTransparency = 1.000
 Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0, 0, 0.2463893, 0)
-Frame.Size = UDim2.new(0, 372, 0, 135)
+Frame.Position = UDim2.new(0.504754424, 0, 0.0929931924, 0)
+Frame.Size = UDim2.new(0, 372, 0, 207)
 
 TextLabel.Parent = Frame
 TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 TextLabel.BackgroundTransparency = 1.000
 TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
 TextLabel.BorderSizePixel = 0
-TextLabel.Position = UDim2.new(0, 0, -0.318518519, 0)
+TextLabel.Position = UDim2.new(0, 0, -0.299194843, 0)
 TextLabel.Size = UDim2.new(1, 0, 0.370370358, 0)
 TextLabel.Font = Enum.Font.SourceSans
 TextLabel.Text = "select player to slap"
@@ -78,14 +78,15 @@ ScrollingFrame_2.BackgroundTransparency = 1.000
 ScrollingFrame_2.BorderColor3 = Color3.fromRGB(0, 0, 0)
 ScrollingFrame_2.BorderSizePixel = 0
 ScrollingFrame_2.Size = UDim2.new(1, 0, 1, 0)
+ScrollingFrame_2.CanvasSize = UDim2.new(0, 0, 5, 0)
 
 Selectplayer.Name = "Selectplayer"
 Selectplayer.Parent = ScrollingFrame_2
 Selectplayer.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 Selectplayer.BorderColor3 = Color3.fromRGB(0, 0, 0)
 Selectplayer.BorderSizePixel = 0
-Selectplayer.Position = UDim2.new(0, 0, 0.0913727954, 0)
-Selectplayer.Size = UDim2.new(1, 0, 0.107407406, 0)
+Selectplayer.Position = UDim2.new(0, 0, -7.37139558e-08, 0)
+Selectplayer.Size = UDim2.new(1, 0, 0.03827722, 0)
 Selectplayer.Font = Enum.Font.SourceSans
 Selectplayer.Text = "Player1"
 Selectplayer.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -223,7 +224,7 @@ local function UpdatePlayerlist()
 	end
 end
 
-while task.wait(5) do
+while task.wait(10) do
 	UpdatePlayerlist()
 end
 
