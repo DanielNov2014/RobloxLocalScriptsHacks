@@ -65,7 +65,7 @@ TextLabel.BorderSizePixel = 0
 TextLabel.Position = UDim2.new(0, 0, -0.299194843, 0)
 TextLabel.Size = UDim2.new(1, 0, 0.370370358, 0)
 TextLabel.Font = Enum.Font.SourceSans
-TextLabel.Text = "select player to slap (v 3.0)"
+TextLabel.Text = "select player to slap"
 TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextLabel.TextScaled = true
 TextLabel.TextSize = 14.000
@@ -235,7 +235,6 @@ local args = {
 }
 game:GetService("ReplicatedStorage"):WaitForChild("GiftCollect"):FireServer(unpack(args))
 
-
 slap.MouseButton1Click:Connect(function()
 	if player then
 		local targetPlayer = game:GetService("Players"):FindFirstChild(player)
@@ -248,7 +247,9 @@ slap.MouseButton1Click:Connect(function()
 					targetPlayer.Character,
 					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
 				}
-				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+				task.spawn(function()
+					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+				end)
 				game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 			else
 				warn("Player found but character missing: "..targetPlayer.Name)
@@ -273,7 +274,9 @@ _10xslap.MouseButton1Click:Connect(function()
 					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
 				}
 				for i = 1,10 do
-					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					task.spawn(function()
+						game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					end)
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 					task.wait(0.2)
 				end
@@ -300,7 +303,9 @@ _100xslap.MouseButton1Click:Connect(function()
 					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
 				}
 				for i = 1,100 do
-					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					task.spawn(function()
+						game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					end)
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 					task.wait(0.1)
 				end
@@ -320,3 +325,5 @@ while task.wait(10) do
 	UpdatePlayerlist()
 end
 --loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
+
+
