@@ -296,11 +296,9 @@ _100xslap.MouseButton1Click:Connect(function()
 					game:GetService("Players"):WaitForChild(player).Character,
 					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
-				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-
 				for i = 1,100 do
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
-					task.wait(0.1)
+					task.wait(0.2)
 				end
 			else
 				warn("Player found but character missing: "..targetPlayer.Name)
