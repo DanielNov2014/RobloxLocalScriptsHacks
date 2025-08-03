@@ -248,7 +248,7 @@ slap.MouseButton1Click:Connect(function()
 					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
 				task.spawn(function()
-					game:GetService("Players").LocalPlayer.Character.FreeSlap.Event
+					game:GetService("Players").LocalPlayer.Character.FreeSlap.Event:FireServer(unpack(args))
 				end)
 				--game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 			else
