@@ -244,8 +244,8 @@ slap.MouseButton1Click:Connect(function()
 				print("founded")
 				local args = {
 					"slash",
-					targetPlayer.Character,
-					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+					game:GetService("Players"):WaitForChild(player).Character,
+					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
 				task.spawn(function()
 					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
@@ -270,8 +270,8 @@ _10xslap.MouseButton1Click:Connect(function()
 			if targetPlayer.Character then
 				local args = {
 					"slash",
-					targetPlayer.Character,
-					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+					game:GetService("Players"):WaitForChild(player).Character,
+					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
 				for i = 1,10 do
 					task.spawn(function()
@@ -299,9 +299,11 @@ _100xslap.MouseButton1Click:Connect(function()
 			if targetPlayer.Character then
 				local args = {
 					"slash",
-					targetPlayer.Character,
-					vector.create(-7.114884853363037, 3.47732679983892e-07, -7.026978015899658)
+					game:GetService("Players"):WaitForChild(player).Character,
+					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
+				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+
 				for i = 1,100 do
 					task.spawn(function()
 						game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
