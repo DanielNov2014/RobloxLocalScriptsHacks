@@ -152,6 +152,21 @@ slap.Text = "slap <player>"
 slap.TextColor3 = Color3.fromRGB(0, 0, 0)
 slap.TextSize = 14.000
 
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local TextBox = Instance.new("TextBox")
+local TextButton1 = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+
 UICorner_6.CornerRadius = UDim.new(1, 0)
 UICorner_6.Parent = slap
 
@@ -248,7 +263,11 @@ slap.MouseButton1Click:Connect(function()
 					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
 				task.spawn(function()
-					game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
+					for i,v in game:GetService("Players").LocalPlayer.Character:GetChildren() do
+						if v:IsA("Tool") then
+							v:WaitForChild("Event"):FireServer(unpack(args))
+						end
+					end
 				end)
 				--game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 			else
@@ -274,10 +293,11 @@ _10xslap.MouseButton1Click:Connect(function()
 					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
 				for i = 1,10 do
-					task.spawn(function()
-						game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-					end)
-					--game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
+					for i,v in game:GetService("Players").LocalPlayer.Character:GetChildren() do
+						if v:IsA("Tool") then
+							v:WaitForChild("Event"):FireServer(unpack(args))
+						end
+					end
 					task.wait(0.2)
 				end
 			else
@@ -302,12 +322,13 @@ _100xslap.MouseButton1Click:Connect(function()
 					game:GetService("Players"):WaitForChild(player).Character,
 					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
 				}
-				game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
 
 				for i = 1,100 do
-					task.spawn(function()
-						game:GetService("Players").LocalPlayer.Character:WaitForChild("Slap"):WaitForChild("Event"):FireServer(unpack(args))
-					end)
+					for i,v in game:GetService("Players").LocalPlayer.Character:GetChildren() do
+						if v:IsA("Tool") then
+							v:WaitForChild("Event"):FireServer(unpack(args))
+						end
+					end
 					--game:GetService("Players").LocalPlayer.Character:WaitForChild("Blue Hanger"):WaitForChild("Event"):FireServer(unpack(args))
 					task.wait(0.1)
 				end
@@ -322,10 +343,13 @@ _100xslap.MouseButton1Click:Connect(function()
 	end
 end)
 
-
-while task.wait(10) do
+game.Players.PlayerAdded:Connect(function(plr)
 	UpdatePlayerlist()
-end
---loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
+end)
 
+game.Players.PlayerRemoving:Connect(function(plr)
+	UpdatePlayerlist()
+end)
+
+--loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
 
