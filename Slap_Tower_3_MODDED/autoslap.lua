@@ -352,4 +352,3 @@ game.Players.PlayerRemoving:Connect(function(plr)
 end)
 
 --loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Slap_Tower_3_MODDED/autoslap.lua"))()
-
