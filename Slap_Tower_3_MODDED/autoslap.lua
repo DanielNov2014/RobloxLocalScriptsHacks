@@ -260,7 +260,7 @@ slap.MouseButton1Click:Connect(function()
 				local args = {
 					"slash",
 					game:GetService("Players"):WaitForChild(player).Character,
-					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
+					vector.create(4.270020008087158, -999999999999999999999, 9.04250717163086)
 				}
 				task.spawn(function()
 					for i,v in game:GetService("Players").LocalPlayer.Character:GetChildren() do
@@ -290,7 +290,7 @@ _10xslap.MouseButton1Click:Connect(function()
 				local args = {
 					"slash",
 					game:GetService("Players"):WaitForChild(player).Character,
-					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
+					vector.create(4.270020008087158, -999999999999999999999, 9.04250717163086)
 				}
 				for i = 1,10 do
 					for i,v in game:GetService("Players").LocalPlayer.Character:GetChildren() do
@@ -320,7 +320,7 @@ _100xslap.MouseButton1Click:Connect(function()
 				local args = {
 					"slash",
 					game:GetService("Players"):WaitForChild(player).Character,
-					vector.create(4.270020008087158, -0.000001020714648802823, 9.04250717163086)
+					vector.create(4.270020008087158, -999999999999999999999, 9.04250717163086)
 				}
 
 				for i = 1,100 do
