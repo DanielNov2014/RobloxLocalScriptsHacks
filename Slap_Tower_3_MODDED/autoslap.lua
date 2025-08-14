@@ -320,7 +320,7 @@ _100xslap.MouseButton1Click:Connect(function()
 				local args = {
 					"slash",
 					game:GetService("Players"):WaitForChild(player).Character,
-					vector.create(4.270020008087158, -math.huge 9.04250717163086)
+					vector.create(4.270020008087158, -math.huge, 9.04250717163086)
 				}
 
 				for i = 1,100 do
