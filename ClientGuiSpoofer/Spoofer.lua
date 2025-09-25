@@ -109,18 +109,15 @@ end
 local function generateGuiCodeFromPath(path)
 	local code = "local player = game.Players.LocalPlayer\n\n"
 	local uiInstance = findInstanceByPath(path)
-	if not uiInstance then
-		-- If not found, create a default ScreenGui
-		code = code .. "-- WARNING: Could not find UI at path '" .. path .. "'.\n"
+	if not uiInstance or not uiInstance:IsA("ScreenGui") then
+		-- If not found or not a ScreenGui, create a default ScreenGui
+		code = code .. "-- WARNING: Could not find a ScreenGui at path '" .. path .. "'.\n"
 		code = code .. "-- Creating a default ScreenGui named 'Default'.\n"
 		code = code .. "local Default = Instance.new(\"ScreenGui\")\n"
 		code = code .. "Default.Name = \"Default\"\n"
 		code = code .. "Default.Parent = player:WaitForChild(\"PlayerGui\")\n"
 		code = code .. "\n-- Add your UI elements to Default below\n"
 		return code
-	end
-	if not uiInstance:IsA("ScreenGui") then
-		return "-- ERROR: Instance at path is not a ScreenGui"
 	end
 	code = code .. string.format("local %s = Instance.new(\"ScreenGui\")\n", uiInstance.Name)
 	code = code .. string.format("%s.Name = \"%s\"\n", uiInstance.Name, uiInstance.Name)
