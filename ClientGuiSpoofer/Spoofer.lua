@@ -46,7 +46,7 @@ outputBox.TextYAlignment = Enum.TextYAlignment.Top
 outputBox.ClearTextOnFocus = false
 outputBox.MultiLine = true
 outputBox.TextEditable = true
-outputBox.Text = "-- Enter the path to your UI below (e.g. StarterGui.Loading) and press the button to generate code.\n-- If no ScreenGui is found, a default one will be created."
+outputBox.Text = "-- Enter the path to your UI below (e.g. StarterGui.Loading or PlayerGui.Loading) and press the button to generate code.\n-- If no ScreenGui is found, a default one will be created."
 outputBox.Parent = outputGui
 
 local pathBox = Instance.new("TextBox")
@@ -62,7 +62,7 @@ pathBox.TextYAlignment = Enum.TextYAlignment.Center
 pathBox.ClearTextOnFocus = false
 pathBox.MultiLine = false
 pathBox.TextEditable = true
-pathBox.PlaceholderText = "Type UI path here (e.g. StarterGui.Loading)"
+pathBox.PlaceholderText = "Type UI path here (e.g. StarterGui.Loading or PlayerGui.Loading)"
 pathBox.Parent = outputGui
 
 local generateButton = Instance.new("TextButton")
@@ -82,7 +82,11 @@ local function findInstanceByPath(path)
 	end
 	if #segments == 0 then return nil end
 	local root = game
-	if root:FindFirstChild(segments[1]) then
+	-- Support PlayerGui as a root
+	if segments[1] == "PlayerGui" then
+		root = player:FindFirstChild("PlayerGui")
+		if not root then return nil end
+	elseif root:FindFirstChild(segments[1]) then
 		root = root:FindFirstChild(segments[1])
 	else
 		local ok, service = pcall(function() return game:GetService(segments[1]) end)
@@ -136,7 +140,7 @@ end
 generateButton.MouseButton1Click:Connect(function()
 	local path = pathBox.Text
 	if path == "" then
-		outputBox.Text = "-- ERROR: Please enter a path to your UI (e.g. StarterGui.Loading)"
+		outputBox.Text = "-- ERROR: Please enter a path to your UI (e.g. StarterGui.Loading or PlayerGui.Loading)"
 		return
 	end
 	outputBox.Text = generateGuiCodeFromPath(path)
