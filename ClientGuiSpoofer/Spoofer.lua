@@ -34,7 +34,7 @@ outputGui.Name = "GuiCodeOutput"
 outputGui.Parent = player:WaitForChild("PlayerGui")
 
 local outputBox = Instance.new("TextBox")
-outputBox.Size = UDim2.new(0.85, 0, 0.7, 0) -- Slightly smaller to fit path box
+outputBox.Size = UDim2.new(0.85, 0, 0.7, 0)
 outputBox.Position = UDim2.new(0.075, 0, 0.15, 0)
 outputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 outputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -46,7 +46,7 @@ outputBox.TextYAlignment = Enum.TextYAlignment.Top
 outputBox.ClearTextOnFocus = false
 outputBox.MultiLine = true
 outputBox.TextEditable = true
-outputBox.Text = "-- Enter the path to your UI below and press the button to generate code"
+outputBox.Text = "-- Enter the path to your UI below (e.g. StarterGui.Loading) and press the button to generate code.\n-- If no ScreenGui is found, a default one will be created."
 outputBox.Parent = outputGui
 
 local pathBox = Instance.new("TextBox")
@@ -76,7 +76,6 @@ generateButton.Text = "Generate UI Code"
 generateButton.Parent = outputGui
 
 local function findInstanceByPath(path)
-	-- path: "StarterGui.Loading" or "Workspace.Folder.Gui"
 	local segments = {}
 	for segment in string.gmatch(path, "[^.]+") do
 		table.insert(segments, segment)
@@ -86,7 +85,6 @@ local function findInstanceByPath(path)
 	if root:FindFirstChild(segments[1]) then
 		root = root:FindFirstChild(segments[1])
 	else
-		-- Try GetService for top-level services
 		local ok, service = pcall(function() return game:GetService(segments[1]) end)
 		if ok and service then
 			root = service
@@ -108,7 +106,14 @@ local function generateGuiCodeFromPath(path)
 	local code = "local player = game.Players.LocalPlayer\n\n"
 	local uiInstance = findInstanceByPath(path)
 	if not uiInstance then
-		return "-- ERROR: Could not find UI at path '" .. path .. "'"
+		-- If not found, create a default ScreenGui
+		code = code .. "-- WARNING: Could not find UI at path '" .. path .. "'.\n"
+		code = code .. "-- Creating a default ScreenGui named 'Default'.\n"
+		code = code .. "local Default = Instance.new(\"ScreenGui\")\n"
+		code = code .. "Default.Name = \"Default\"\n"
+		code = code .. "Default.Parent = player:WaitForChild(\"PlayerGui\")\n"
+		code = code .. "\n-- Add your UI elements to Default below\n"
+		return code
 	end
 	if not uiInstance:IsA("ScreenGui") then
 		return "-- ERROR: Instance at path is not a ScreenGui"
@@ -118,7 +123,6 @@ local function generateGuiCodeFromPath(path)
 	code = code .. string.format("%s.Parent = player:WaitForChild(\"PlayerGui\")\n", uiInstance.Name)
 	for _, descendant in uiInstance:GetDescendants() do
 		code = code .. generateCodeForInstance(descendant)
-		-- Set parent
 		if descendant.Parent and descendant.Parent ~= uiInstance then
 			code = code .. string.format("%s.Parent = %s\n", descendant.Name, descendant.Parent.Name)
 		else
