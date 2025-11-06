@@ -354,7 +354,7 @@ if slap ~= nil then
 	Title.TextWrapped = true
 	
 	flingplus.Name = "flingplus"
-	flingplus.Parent = game.StarterGui.SlapLogs.QuickCommands
+	flingplus.Parent = QuickCommands
 	flingplus.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
 	flingplus.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	flingplus.BorderSizePixel = 0
@@ -368,7 +368,7 @@ if slap ~= nil then
 	flingplus.TextWrapped = true
 
 	nearby.Name = "nearby"
-	nearby.Parent = game.StarterGui.SlapLogs.QuickCommands
+	nearby.Parent = QuickCommands
 	nearby.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
 	nearby.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	nearby.BorderSizePixel = 0
@@ -382,7 +382,7 @@ if slap ~= nil then
 	nearby.TextWrapped = true
 
 	kill.Name = "kill"
-	kill.Parent = game.StarterGui.SlapLogs.QuickCommands
+	kill.Parent = QuickCommands
 	kill.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
 	kill.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	kill.BorderSizePixel = 0
@@ -396,7 +396,7 @@ if slap ~= nil then
 	kill.TextWrapped = true
 
 	fling.Name = "fling"
-	fling.Parent = game.StarterGui.SlapLogs.QuickCommands
+	fling.Parent = QuickCommands
 	fling.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
 	fling.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	fling.BorderSizePixel = 0
