@@ -19,6 +19,10 @@ local SlapLogs = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
 local TextLabel = Instance.new("TextLabel")
+local QuickCommands = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local fling = Instance.new("TextButton")
+local kill = Instance.new("TextButton")
 
 function AddLog(text:string)
 	local textlog = TextLabel:Clone()
@@ -305,7 +309,7 @@ if slap ~= nil then
 
 	UIListLayout.Parent = Frame
 	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-	
+
 	TextLabel.Name = "Example_text"
 	TextLabel.Parent = Frame
 	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -321,6 +325,83 @@ if slap ~= nil then
 	TextLabel.TextWrapped = true
 	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
 	TextLabel.Visible = false
+
+	QuickCommands.Name = "QuickCommands"
+	QuickCommands.Parent = SlapLogs
+	QuickCommands.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+	QuickCommands.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	QuickCommands.BorderSizePixel = 0
+	QuickCommands.Position = UDim2.new(0.330555558, 0, 0.691376686, 0)
+	QuickCommands.Size = UDim2.new(0.144444451, 0, 0.291981846, 0)
+	QuickCommands.ZIndex = 999999
+
+	Title.Name = "Title"
+	Title.Parent = QuickCommands
+	Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	Title.BackgroundTransparency = 1.000
+	Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Title.BorderSizePixel = 0
+	Title.Size = UDim2.new(1, 0, 0.119629756, 0)
+	Title.Font = Enum.Font.SourceSans
+	Title.Text = "Quick commands"
+	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Title.TextScaled = true
+	Title.TextSize = 14.000
+	Title.TextWrapped = true
+
+	fling.Name = "fling"
+	fling.Parent = QuickCommands
+	fling.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+	fling.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	fling.BorderSizePixel = 0
+	fling.Position = UDim2.new(0, 0, 0.248704657, 0)
+	fling.Size = UDim2.new(1, 0, 0.176165804, 0)
+	fling.Font = Enum.Font.SourceSans
+	fling.Text = "fling all"
+	fling.TextColor3 = Color3.fromRGB(0, 0, 0)
+	fling.TextScaled = true
+	fling.TextSize = 14.000
+	fling.TextWrapped = true
+
+	kill.Name = "kill"
+	kill.Parent = QuickCommands
+	kill.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+	kill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	kill.BorderSizePixel = 0
+	kill.Position = UDim2.new(0, 0, 0.424870461, 0)
+	kill.Size = UDim2.new(1, 0, 0.176165804, 0)
+	kill.Font = Enum.Font.SourceSans
+	kill.Text = "kill all"
+	kill.TextColor3 = Color3.fromRGB(0, 0, 0)
+	kill.TextScaled = true
+	kill.TextSize = 14.000
+	kill.TextWrapped = true
+
+	kill.MouseButton1Click:Connect(function()
+		task.spawn(function()
+			AddLog("[DEBUG] kill command active")
+			for _, player in game.Players:GetPlayers() do
+				if player ~= game.Players.LocalPlayer then
+					AddLog("Killing "..player.Name)
+					killslap(player)
+					task.wait(0.05)
+				end
+			end
+		end)
+	end)
+	fling.MouseButton1Click:Connect(function()
+		task.spawn(function()
+			AddLog("[DEBUG] fling command active")
+			for _, player in game.Players:GetPlayers() do
+				if player ~= game.Players.LocalPlayer then
+					AddLog("Flinging "..player.Name)
+					hit(player)
+					task.wait(0.05)
+				end
+			end
+		end)
+	end)
+
 	AddLog("Loaded Succesfully.")
 	AddLog("[DEBUG] slap tool location: "..slap:GetFullName())
 	game.Players.LocalPlayer.Chatted:Connect(function(msg)
@@ -336,7 +417,7 @@ if slap ~= nil then
 						if player.Character then
 							AddLog("Flinging "..player.Name)
 							hit(player)
-							task.wait(0.25)
+							task.wait(0.05)
 						end
 					end
 				end
@@ -351,7 +432,7 @@ if slap ~= nil then
 						if randomPlayer.Character then
 							AddLog("Flinging "..randomPlayer.Name)
 							hit(randomPlayer)
-							task.wait(0.25)
+							task.wait(0.05)
 						end
 					end
 				end
@@ -373,7 +454,7 @@ if slap ~= nil then
 					if player ~= game.Players.LocalPlayer then
 						AddLog("Killing "..player.Name)
 						killslap(player)
-						task.wait(0.25)
+						task.wait(0.05)
 					end
 				end
 			elseif args[2] == "random" then
@@ -387,7 +468,7 @@ if slap ~= nil then
 						if randomPlayer.Character then
 							AddLog("Killing "..randomPlayer.Name)
 							killslap(randomPlayer)
-							task.wait(0.25)
+							task.wait(0.05)
 						end
 					end
 				end
