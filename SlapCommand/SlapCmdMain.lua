@@ -32,7 +32,7 @@ function hit(plr)
 	local args = {
 		"slash",
 		game:GetService("Players"):WaitForChild(plr.Name).Character,
-		Vector3.new(math.random(1,20),100,math.random(1,20))
+		Vector3.new(math.random(1,20),10,math.random(1,20))
 	}
 	task.spawn(function()
 		slap.Event:FireServer(unpack(args))
