@@ -536,7 +536,7 @@ if slap ~= nil then
 					end)
 				end
 			end
-			task.wait(25)
+			task.wait(40)
 			stopOrbitCamera()
 		end)
 	end)
