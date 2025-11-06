@@ -8,7 +8,7 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
-print("version test v 4.0")
+print("version test v 5.0")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -27,6 +27,14 @@ local flingplus = Instance.new("TextButton")
 local nearby = Instance.new("TextButton")
 local kill = Instance.new("TextButton")
 local fling = Instance.new("TextButton")
+
+-- Camera orbit variables
+local orbitConnection = nil
+local orbiting = false
+local orbitTarget = nil
+local orbitAngle = 0
+local orbitRadius = 15
+local orbitSpeed = math.rad(60) -- degrees per second, in radians
 
 function AddLog(text:string)
 	local textlog = TextLabel:Clone()
@@ -289,14 +297,69 @@ function disableKillSelectMode()
 	removeInfoBillboard()
 end
 
+-- Camera Orbit Functions
+
+function startOrbitCameraAroundRandomPlayer()
+	if orbiting then
+		AddLog("Already orbiting a player.")
+		return
+	end
+	local Players = game:GetService("Players")
+	local LocalPlayer = Players.LocalPlayer
+	local others = {}
+	for i, plr in Players:GetPlayers() do
+		if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+			table.insert(others, plr)
+		end
+	end
+	if #others == 0 then
+		AddLog("No other players to orbit.")
+		return
+	end
+	local randomIndex = math.random(1, #others)
+	local targetPlayer = others[randomIndex]
+	local targetChar = targetPlayer.Character
+	local targetRoot = targetChar:FindFirstChild("HumanoidRootPart")
+	if not targetRoot then
+		AddLog("Target player has no HumanoidRootPart.")
+		return
+	end
+	orbitTarget = targetRoot
+	orbiting = true
+	orbitAngle = 0
+	AddLog("Orbiting camera around "..targetPlayer.Name)
+	local camera = workspace.CurrentCamera
+	camera.CameraType = Enum.CameraType.Scriptable
+	orbitConnection = game:GetService("RunService").RenderStepped:Connect(function(dt)
+		if not orbiting or not orbitTarget or not orbitTarget.Parent then
+			stopOrbitCamera()
+			return
+		end
+		orbitAngle = orbitAngle + orbitSpeed * dt
+		local targetPos = orbitTarget.Position
+		local camPos = targetPos + Vector3.new(math.cos(orbitAngle) * orbitRadius, 5, math.sin(orbitAngle) * orbitRadius)
+		camera.CFrame = CFrame.new(camPos, targetPos)
+	end)
+end
+
+function stopOrbitCamera()
+	if orbitConnection then
+		orbitConnection:Disconnect()
+		orbitConnection = nil
+	end
+	orbiting = false
+	orbitTarget = nil
+	local camera = workspace.CurrentCamera
+	camera.CameraType = Enum.CameraType.Custom
+	AddLog("Stopped orbiting camera.")
+end
+
+-- Expose to _G for easy access
+_G.startOrbitCameraAroundRandomPlayer = startOrbitCameraAroundRandomPlayer
+_G.stopOrbitCamera = stopOrbitCamera
+
 slap = findslap()
 if slap ~= nil then
-	-- Gui to Lua
-	-- Version: 3.2
-
-	-- Instances:
-
-	--Properties:
 
 	SlapLogs.Name = "SlapLogs"
 	SlapLogs.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -412,21 +475,22 @@ if slap ~= nil then
 	flingplus.MouseButton1Click:Connect(function()
 		task.spawn(function()
 			AddLog("[DEBUG] flingplus command active")
+			startOrbitCameraAroundRandomPlayer()
 			for _, player in game.Players:GetPlayers() do
 				if player ~= game.Players.LocalPlayer then
 					AddLog("Flinging "..player.Name .. " out of the obby")
 					task.spawn(function()
 						repeat
-						local args = {
-							"slash",
-							player.Character,
-							Vector3.new(0,150,0)
-						}
-						task.spawn(function()
-							slap.Event:FireServer(unpack(args))
-						end)
-						AddLog(player.Name .. "is not high enough fling again...")
-						task.wait(0.1)
+							local args = {
+								"slash",
+								player.Character,
+								Vector3.new(0,150,0)
+							}
+							task.spawn(function()
+								slap.Event:FireServer(unpack(args))
+							end)
+							AddLog(player.Name .. "is not high enough fling again...")
+							task.wait(0.1)
 						until player.Character:FindFirstChild("HumanoidRootPart").Position.Y >= 1610
 						task.wait(2)
 						local args = {
@@ -441,6 +505,8 @@ if slap ~= nil then
 					end)
 				end
 			end
+			task.wait(3)
+			stopOrbitCamera()
 		end)
 	end)
 
@@ -577,6 +643,10 @@ if slap ~= nil then
 				disableKillSelectMode()
 				print("Kill select mode disabled")
 			end
+		elseif args[1] == "/orbit" then
+			startOrbitCameraAroundRandomPlayer()
+		elseif args[1] == "/stoporbit" then
+			stopOrbitCamera()
 		end
 	end)
 end
@@ -613,3 +683,4 @@ task.spawn(function()
 		task.wait(0.5)
 	end
 end)
+
