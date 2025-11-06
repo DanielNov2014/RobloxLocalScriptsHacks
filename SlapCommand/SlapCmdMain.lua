@@ -1,4 +1,5 @@
 --this script works in all games with a slap that has a remotevent called "Event"
+--heres the loadstring! loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/SlapCommand/SlapCmdMain.lua"))()
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
