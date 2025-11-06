@@ -17,6 +17,14 @@ local Frame = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
 local TextLabel = Instance.new("TextLabel")
 
+function AddLog(text:string)
+	local textlog = TextLabel:Clone()
+	textlog.Visible = true
+	textlog.Text = text
+	textlog.Parent = Frame
+	game.Debris:AddItem(textlog, 10)
+end
+
 function findslap()
 	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
 		if v.Name == "Event" then
@@ -140,6 +148,7 @@ function enablePlayerSelection()
 			local targetParent = target.Parent
 			for _, plr in game.Players:GetPlayers() do
 				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					AddLog("flinging "..plr.Name)
 					hit(plr)
 					selectingPlayer = false
 					mouse.Icon = "" -- Reset mouse icon
@@ -168,6 +177,7 @@ function enablePlayerSelectionKill()
 			local targetParent = target.Parent
 			for _, plr in game.Players:GetPlayers() do
 				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					AddLog("killing "..plr.Name)
 					killslap(plr)
 					selectingPlayer = false
 					mouse.Icon = "" -- Reset mouse icon
@@ -197,6 +207,7 @@ function enableFlingSelectMode()
 			local targetParent = target.Parent
 			for _, plr in game.Players:GetPlayers() do
 				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					AddLog("flinging "..plr.Name)
 					hit(plr)
 					highlightPlayer(plr)
 					showInfoBillboard(plr)
@@ -227,6 +238,7 @@ function enableKillSelectMode()
 			local targetParent = target.Parent
 			for _, plr in game.Players:GetPlayers() do
 				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					AddLog("killing "..plr.Name)
 					killslap(plr)
 					highlightPlayer(plr)
 					showInfoBillboard(plr)
@@ -264,14 +276,6 @@ function disableKillSelectMode()
 	mouse.Icon = ""
 	removeHighlight()
 	removeInfoBillboard()
-end
-
-function AddLog(text:string)
-	local textlog = TextLabel:Clone()
-	textlog.Visible = true
-	textlog.Text = text
-	textlog.Parent = Frame
-	game.Debris:AddItem(textlog, 10)
 end
 
 slap = findslap()
@@ -358,6 +362,7 @@ if slap ~= nil then
 				end
 			end
 		elseif args[1] == "/kill" then
+			AddLog("[DEBUG] kill command active")
 			if args[2] == nil or args[2] == "" then
 				enablePlayerSelectionKill()
 			elseif args[2] == "all" then
