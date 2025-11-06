@@ -5,6 +5,7 @@
 --2. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED (you cant use custom power so kill wont work)
 --3. https://www.roblox.com/games/121347585984680/Green-Bean-SLAP-Tower
 --4. https://www.roblox.com/games/113679072768135/Free-Admin-Slap-Tower-Obby-BRAINROT
+--5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
