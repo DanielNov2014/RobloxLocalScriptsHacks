@@ -15,6 +15,7 @@ local flingSelectMode = false
 local killSelectMode = false
 local highlightInstance = nil
 local infoBillboard = nil
+local isreplitentactive = false
 local SlapLogs = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
 local UIListLayout = Instance.new("UIListLayout")
@@ -23,6 +24,7 @@ local QuickCommands = Instance.new("Frame")
 local Title = Instance.new("TextLabel")
 local fling = Instance.new("TextButton")
 local kill = Instance.new("TextButton")
+local nearby = Instance.new("TextButton")
 
 function AddLog(text:string)
 	local textlog = TextLabel:Clone()
@@ -376,7 +378,31 @@ if slap ~= nil then
 	kill.TextScaled = true
 	kill.TextSize = 14.000
 	kill.TextWrapped = true
-
+	
+	nearby.Name = "nearby"
+	nearby.Parent = QuickCommands
+	nearby.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+	nearby.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	nearby.BorderSizePixel = 0
+	nearby.Position = UDim2.new(0, 0, 0.601036251, 0)
+	nearby.Size = UDim2.new(1, 0, 0.176165804, 0)
+	nearby.Font = Enum.Font.SourceSans
+	nearby.Text = "fling nearby players (OFF)"
+	nearby.TextColor3 = Color3.fromRGB(0, 0, 0)
+	nearby.TextScaled = true
+	nearby.TextSize = 14.000
+	nearby.TextWrapped = true
+	
+	nearby.MouseButton1Click:Connect(function()
+		if nearby.Text == "fling nearby players (OFF)" then
+			nearby.Text = "fling nearby players (ON)"
+			isreplitentactive = true
+		else
+			nearby.Text = "fling nearby players (OFF)"
+			isreplitentactive = false
+		end
+	end)
+	
 	kill.MouseButton1Click:Connect(function()
 		task.spawn(function()
 			AddLog("[DEBUG] kill command active")
@@ -503,3 +529,36 @@ if slap ~= nil then
 		end
 	end)
 end
+
+function getCharacterRootPart(character)
+	if character then
+		return character:FindFirstChild("HumanoidRootPart")
+	end
+	return nil
+end
+
+task.spawn(function()
+	while true do
+		if isreplitentactive then
+			local localCharacter = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.Character.CharacterAdded:Wait()
+			local localRoot = getCharacterRootPart(localCharacter)
+			if localRoot then
+				for i, player in game.Players:GetPlayers() do
+					-- This will check ALL players, including the local player
+					local character = player.Character
+					local root = getCharacterRootPart(character)
+					if root then
+						local distance = (localRoot.Position - root.Position).Magnitude
+						if distance <= 20 then
+							if player.Name ~= game.Players.LocalPlayer.Name then
+								print(player.Name .. " is within 20 studs!")
+								hit(player)
+							end
+						end
+					end
+				end
+			end
+		end
+		task.wait(0.5)
+	end
+end)
