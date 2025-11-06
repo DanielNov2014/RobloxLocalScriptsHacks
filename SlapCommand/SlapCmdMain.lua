@@ -1,5 +1,8 @@
 --this script works in all games with a slap that has a remotevent called "Event"
 --heres the loadstring! loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/SlapCommand/SlapCmdMain.lua"))()
+--heres some games that this script works in
+--1. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED
+
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -16,13 +19,20 @@ function findslap()
 			return slaptool
 		end
 	end
+	for i,v in game.Players.LocalPlayer.Backpack:GetDescendants() do
+		if v.Name == "Event" then
+			local slaptool = v.Parent
+			print(slaptool.Name)
+			return slaptool
+		end
+	end
 end
 
 function hit(plr)
 	local args = {
 		"slash",
 		game:GetService("Players"):WaitForChild(plr.Name).Character,
-		Vector3.new(10,10,10)
+		Vector3.new(math.random(1,20),10,math.random(1,20))
 	}
 	task.spawn(function()
 		slap.Event:FireServer(unpack(args))
@@ -223,63 +233,64 @@ function disableKillSelectMode()
 end
 
 slap = findslap()
-game.Players.LocalPlayer.Chatted:Connect(function(msg)
-	local args = string.split(msg, " ")
-	print(args[1],args[2])
-	if args[1] == "/fling" then
-		if args[2] == nil or args[2] == "" then
-			enablePlayerSelection()
-		elseif args[2] == "all" then
-			for _, player in game.Players:GetPlayers() do
-				if player ~= game.Players.LocalPlayer then
-					if player.Character then
-						hit(player)
+if slap ~= nil then
+	game.Players.LocalPlayer.Chatted:Connect(function(msg)
+		local args = string.split(msg, " ")
+		print(args[1],args[2])
+		if args[1] == "/fling" then
+			if args[2] == nil or args[2] == "" then
+				enablePlayerSelection()
+			elseif args[2] == "all" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= game.Players.LocalPlayer then
+						if player.Character then
+							hit(player)
+						end
+					end
+				end
+			else
+				for _, player in game.Players:GetPlayers() do
+					if player.Name == args[2] then
+						if player.Character then
+							hit(player)
+						end
 					end
 				end
 			end
-		else
-			for _, player in game.Players:GetPlayers() do
-				if player.Name == args[2] then
-					if player.Character then
-						hit(player)
+		elseif args[1] == "/kill" then
+			if args[2] == "all" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= game.Players.LocalPlayer then
+						killslap(player)
+					end
+				end
+			else
+				for _, player in game.Players:GetPlayers() do
+					if player.Name == args[2] then
+						killslap(player)
 					end
 				end
 			end
-		end
-	elseif args[1] == "/kill" then
-		if args[2] == "all" then
-			for _, player in game.Players:GetPlayers() do
-				if player ~= game.Players.LocalPlayer then
-					killslap(player)
-				end
+		elseif args[1] == "/flingselect" then
+			flingSelectMode = not flingSelectMode
+			if flingSelectMode then
+				killSelectMode = false
+				enableFlingSelectMode()
+				print("Fling select mode enabled")
+			else
+				disableFlingSelectMode()
+				print("Fling select mode disabled")
 			end
-		else
-			for _, player in game.Players:GetPlayers() do
-				if player.Name == args[2] then
-					killslap(player)
-				end
+		elseif args[1] == "/killselect" then
+			killSelectMode = not killSelectMode
+			if killSelectMode then
+				flingSelectMode = false
+				enableKillSelectMode()
+				print("Kill select mode enabled")
+			else
+				disableKillSelectMode()
+				print("Kill select mode disabled")
 			end
 		end
-	elseif args[1] == "/flingselect" then
-		flingSelectMode = not flingSelectMode
-		if flingSelectMode then
-			killSelectMode = false
-			enableFlingSelectMode()
-			print("Fling select mode enabled")
-		else
-			disableFlingSelectMode()
-			print("Fling select mode disabled")
-		end
-	elseif args[1] == "/killselect" then
-		killSelectMode = not killSelectMode
-		if killSelectMode then
-			flingSelectMode = false
-			enableKillSelectMode()
-			print("Kill select mode enabled")
-		else
-			disableKillSelectMode()
-			print("Kill select mode disabled")
-		end
-	end
-end)
-
+	end)
+end
