@@ -8,6 +8,7 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
+print("version v 9.6.7")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -517,19 +518,19 @@ if slap ~= nil then
 						repeat
 							task.wait()
 						until player.Character:WaitForChild("HumanoidRootPart").Position.Y <= 150
-						for i = 1,10 do
+						for i = 1,30 do
 							repeat
 								local args = {
 									"slash",
 									player.Character,
-									Vector3.new(0,10,0)
+									Vector3.new(0,50,0)
 								}
 								task.spawn(function()
 									slap.Event:FireServer(unpack(args))
 								end)
 								task.wait(0.1)
 							until player.Character:WaitForChild("HumanoidRootPart").Position.Y >= 300
-							AddLog("Loop (" .. i .. "/10) comepleted! on " .. player.Name)
+							AddLog("Loop (" .. i .. "/30) comepleted! on " .. player.Name)
 						end
 						task.wait(0.05)
 					end)
@@ -714,4 +715,5 @@ task.spawn(function()
 		task.wait(0.5)
 	end
 end)
+
 
