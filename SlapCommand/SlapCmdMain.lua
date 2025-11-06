@@ -8,7 +8,7 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
-print("version test v 6.0")
+print("version test v 7.0")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -493,19 +493,33 @@ if slap ~= nil then
 							task.wait(0.1)
 						until player.Character:FindFirstChild("HumanoidRootPart").Position.Y >= 1610
 						task.wait(2)
-						local args = {
-							"slash",
-							player.Character,
-							Vector3.new(100,30,100)
-						}
-						task.spawn(function()
-							slap.Event:FireServer(unpack(args))
-						end)
+						repeat
+							local args = {
+								"slash",
+								player.Character,
+								Vector3.new(100,10,0)
+							}
+							task.spawn(function()
+								slap.Event:FireServer(unpack(args))
+							end)
+							task.wait(0.1)
+						until player.Character:FindFirstChild("HumanoidRootPart").Position.X >= 300
+						repeat
+							local args = {
+								"slash",
+								player.Character,
+								Vector3.new(0,10,100)
+							}
+							task.spawn(function()
+								slap.Event:FireServer(unpack(args))
+							end)
+							task.wait(0.1)
+						until player.Character:FindFirstChild("HumanoidRootPart").Position.Z >= 300
 						task.wait(0.05)
 					end)
 				end
 			end
-			task.wait(10)
+			task.wait(25)
 			stopOrbitCamera()
 		end)
 	end)
