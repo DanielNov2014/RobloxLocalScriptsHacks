@@ -32,7 +32,7 @@ function hit(plr)
 	local args = {
 		"slash",
 		game:GetService("Players"):WaitForChild(plr.Name).Character,
-		Vector3.new(math.random(1,20),10,math.random(1,20))
+		Vector3.new(math.random(1,20),100,math.random(1,20))
 	}
 	task.spawn(function()
 		slap.Event:FireServer(unpack(args))
@@ -248,6 +248,19 @@ if slap ~= nil then
 						end
 					end
 				end
+			elseif args[2] == "random" then
+				local players = game.Players:GetPlayers()
+				if args[3] == nil then
+					args[3] = 1
+				end
+				for i = 1,args[3] do
+				local randomPlayer = players[math.random(1, #players)]
+				if randomPlayer ~= game.Players.LocalPlayer then
+				if randomPlayer.Character then
+					hit(randomPlayer)
+					end
+				end
+				end
 			else
 				for _, player in game.Players:GetPlayers() do
 					if player.Name == args[2] then
@@ -262,6 +275,19 @@ if slap ~= nil then
 				for _, player in game.Players:GetPlayers() do
 					if player ~= game.Players.LocalPlayer then
 						killslap(player)
+					end
+				end
+			elseif args[2] == "random" then
+				local players = game.Players:GetPlayers()
+				if args[3] == nil then
+					args[3] = 1
+				end
+				for i = 1,args[3] do
+					local randomPlayer = players[math.random(1, #players)]
+					if randomPlayer ~= game.Players.LocalPlayer then
+						if randomPlayer.Character then
+							killslap(randomPlayer)
+						end
 					end
 				end
 			else
