@@ -2,7 +2,7 @@
 --heres the loadstring! loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/SlapCommand/SlapCmdMain.lua"))()
 --heres some games that this script works in
 --1. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED
-
+--2. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED (you cant use custom power so kill wont work)
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
