@@ -8,7 +8,7 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
-print("version test v 2.0")
+print("version test v 3.0")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -352,7 +352,7 @@ if slap ~= nil then
 	Title.TextScaled = true
 	Title.TextSize = 14.000
 	Title.TextWrapped = true
-	
+
 	flingplus.Name = "flingplus"
 	flingplus.Parent = QuickCommands
 	flingplus.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
@@ -415,29 +415,31 @@ if slap ~= nil then
 			for _, player in game.Players:GetPlayers() do
 				if player ~= game.Players.LocalPlayer then
 					AddLog("Flinging "..player.Name .. " out of the obby")
-					local args = {
-						"slash",
-						player.Character,
-						Vector3.new(0,150,0)
-					}
 					task.spawn(function()
-						slap.Event:FireServer(unpack(args))
+						local args = {
+							"slash",
+							player.Character,
+							Vector3.new(0,150,0)
+						}
+						task.spawn(function()
+							slap.Event:FireServer(unpack(args))
+						end)
+						task.wait(2)
+						local args = {
+							"slash",
+							player.Character,
+							Vector3.new(100,30,100)
+						}
+						task.spawn(function()
+							slap.Event:FireServer(unpack(args))
+						end)
+						task.wait(0.05)
 					end)
-					task.wait(2)
-					local args = {
-						"slash",
-						player.Character,
-						Vector3.new(100,30,100)
-					}
-					task.spawn(function()
-						slap.Event:FireServer(unpack(args))
-					end)
-					task.wait(0.05)
 				end
 			end
 		end)
 	end)
-	
+
 	nearby.MouseButton1Click:Connect(function()
 		if nearby.Text == "fling nearby players (OFF)" then
 			nearby.Text = "fling nearby players (ON)"
