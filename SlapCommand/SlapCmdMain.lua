@@ -4,7 +4,9 @@ local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
 local flingSelectMode = false
+local killSelectMode = false
 local highlightInstance = nil
+local infoBillboard = nil
 
 function findslap()
 	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
@@ -61,6 +63,53 @@ function removeHighlight()
 	end
 end
 
+function showInfoBillboard(plr)
+	-- Remove previous info
+	if infoBillboard then
+		infoBillboard:Destroy()
+		infoBillboard = nil
+	end
+	if plr and plr.Character and plr.Character:FindFirstChild("Head") then
+		local bb = Instance.new("BillboardGui")
+		bb.Name = "PlayerInfoBillboard"
+		bb.Adornee = plr.Character.Head
+		bb.Size = UDim2.new(0, 200, 0, 50)
+		bb.StudsOffset = Vector3.new(0, 2.5, 0)
+		bb.AlwaysOnTop = true
+
+		local nameLabel = Instance.new("TextLabel")
+		nameLabel.Size = UDim2.new(1, 0, 0.5, 0)
+		nameLabel.BackgroundTransparency = 1
+		nameLabel.TextColor3 = Color3.fromRGB(255,255,0)
+		nameLabel.TextStrokeTransparency = 0.5
+		nameLabel.Font = Enum.Font.SourceSansBold
+		nameLabel.TextScaled = true
+		nameLabel.Text = plr.DisplayName
+
+		local userLabel = Instance.new("TextLabel")
+		userLabel.Position = UDim2.new(0, 0, 0.5, 0)
+		userLabel.Size = UDim2.new(1, 0, 0.5, 0)
+		userLabel.BackgroundTransparency = 1
+		userLabel.TextColor3 = Color3.fromRGB(255,255,255)
+		userLabel.TextStrokeTransparency = 0.5
+		userLabel.Font = Enum.Font.SourceSans
+		userLabel.TextScaled = true
+		userLabel.Text = "(@" .. plr.Name .. ")"
+
+		nameLabel.Parent = bb
+		userLabel.Parent = bb
+		bb.Parent = plr.Character.Head
+		infoBillboard = bb
+	end
+end
+
+function removeInfoBillboard()
+	if infoBillboard then
+		infoBillboard:Destroy()
+		infoBillboard = nil
+	end
+end
+
 function enablePlayerSelection()
 	print("active")
 	selectingPlayer = true
@@ -106,6 +155,42 @@ function enableFlingSelectMode()
 				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
 					hit(plr)
 					highlightPlayer(plr)
+					showInfoBillboard(plr)
+					-- Remove highlight and info after fling
+					task.delay(0.5, function()
+						removeHighlight()
+						removeInfoBillboard()
+					end)
+					break
+				end
+			end
+		end
+	end)
+end
+
+function enableKillSelectMode()
+	if mouseConnection then
+		mouseConnection:Disconnect()
+		mouseConnection = nil
+	end
+	local player = game.Players.LocalPlayer
+	local mouse = player:GetMouse()
+	mouse.Icon = "rbxassetid://6035047400"
+	mouseConnection = mouse.Button1Down:Connect(function()
+		if not killSelectMode then return end
+		local target = mouse.Target
+		if target then
+			local targetParent = target.Parent
+			for _, plr in game.Players:GetPlayers() do
+				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					killslap(plr)
+					highlightPlayer(plr)
+					showInfoBillboard(plr)
+					-- Remove highlight and info after kill fling
+					task.delay(0.5, function()
+						removeHighlight()
+						removeInfoBillboard()
+					end)
 					break
 				end
 			end
@@ -122,6 +207,19 @@ function disableFlingSelectMode()
 	local mouse = player:GetMouse()
 	mouse.Icon = ""
 	removeHighlight()
+	removeInfoBillboard()
+end
+
+function disableKillSelectMode()
+	if mouseConnection then
+		mouseConnection:Disconnect()
+		mouseConnection = nil
+	end
+	local player = game.Players.LocalPlayer
+	local mouse = player:GetMouse()
+	mouse.Icon = ""
+	removeHighlight()
+	removeInfoBillboard()
 end
 
 slap = findslap()
@@ -165,11 +263,22 @@ game.Players.LocalPlayer.Chatted:Connect(function(msg)
 	elseif args[1] == "/flingselect" then
 		flingSelectMode = not flingSelectMode
 		if flingSelectMode then
+			killSelectMode = false
 			enableFlingSelectMode()
 			print("Fling select mode enabled")
 		else
 			disableFlingSelectMode()
 			print("Fling select mode disabled")
+		end
+	elseif args[1] == "/killselect" then
+		killSelectMode = not killSelectMode
+		if killSelectMode then
+			flingSelectMode = false
+			enableKillSelectMode()
+			print("Kill select mode enabled")
+		else
+			disableKillSelectMode()
+			print("Kill select mode disabled")
 		end
 	end
 end)
