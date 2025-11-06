@@ -8,7 +8,7 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
-print("version test v 9.1")
+print("version test v 9.2")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -537,6 +537,7 @@ if slap ~= nil then
 				end
 			end
 			task.wait(40)
+			print("done")
 			stopOrbitCamera()
 		end)
 	end)
