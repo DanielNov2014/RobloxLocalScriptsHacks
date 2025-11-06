@@ -3,6 +3,8 @@
 --heres some games that this script works in
 --1. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED
 --2. https://www.roblox.com/games/96401319196513/FREE-ALL-Slap-Tower-3-MODDED (you cant use custom power so kill wont work)
+--3. https://www.roblox.com/games/121347585984680/Green-Bean-SLAP-Tower
+--4. https://www.roblox.com/games/113679072768135/Free-Admin-Slap-Tower-Obby-BRAINROT
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -10,6 +12,10 @@ local flingSelectMode = false
 local killSelectMode = false
 local highlightInstance = nil
 local infoBillboard = nil
+local SlapLogs = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UIListLayout = Instance.new("UIListLayout")
+local TextLabel = Instance.new("TextLabel")
 
 function findslap()
 	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
@@ -148,6 +154,34 @@ function enablePlayerSelection()
 	end)
 end
 
+function enablePlayerSelectionKill()
+	print("active")
+	selectingPlayer = true
+	local player = game.Players.LocalPlayer
+	local mouse = player:GetMouse()
+	mouse.Icon = "rbxassetid://6035047400" -- Optional: change mouse icon for selection mode
+
+	mouseConnection = mouse.Button1Down:Connect(function()
+		if not selectingPlayer then return end
+		local target = mouse.Target
+		if target then
+			local targetParent = target.Parent
+			for _, plr in game.Players:GetPlayers() do
+				if plr ~= player and plr.Character and (plr.Character == targetParent or target:IsDescendantOf(plr.Character)) then
+					killslap(plr)
+					selectingPlayer = false
+					mouse.Icon = "" -- Reset mouse icon
+					if mouseConnection then
+						mouseConnection:Disconnect()
+						mouseConnection = nil
+					end
+					break
+				end
+			end
+		end
+	end)
+end
+
 function enableFlingSelectMode()
 	if mouseConnection then
 		mouseConnection:Disconnect()
@@ -232,49 +266,71 @@ function disableKillSelectMode()
 	removeInfoBillboard()
 end
 
+function AddLog(text:string)
+	local textlog = TextLabel:Clone()
+	textlog.Visible = true
+	textlog.Text = text
+	textlog.Parent = Frame
+	game.Debris:AddItem(textlog, 10)
+end
+
 slap = findslap()
 if slap ~= nil then
+	-- Gui to Lua
+	-- Version: 3.2
+
+	-- Instances:
+
+	--Properties:
+
+	SlapLogs.Name = "SlapLogs"
+	SlapLogs.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+	SlapLogs.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	SlapLogs.DisplayOrder = 999999999
+
+	Frame.Parent = SlapLogs
+	Frame.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+	Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	Frame.BorderSizePixel = 0
+	Frame.Position = UDim2.new(0.0194444451, 0, 0.692889571, 0)
+	Frame.Size = UDim2.new(0.3, 0, 0.290468991, 0)
+	Frame.ZIndex = 999999
+
+	UIListLayout.Parent = Frame
+	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	
+	TextLabel.Name = "Example_text"
+	TextLabel.Parent = Frame
+	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	TextLabel.BackgroundTransparency = 1.000
+	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	TextLabel.BorderSizePixel = 0
+	TextLabel.Size = UDim2.new(1, 0, 0.0885416642, 0)
+	TextLabel.Font = Enum.Font.SourceSans
+	TextLabel.Text = "Loaded Succesfully"
+	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TextLabel.TextScaled = true
+	TextLabel.TextSize = 14.000
+	TextLabel.TextWrapped = true
+	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+	TextLabel.Visible = false
+	AddLog("Loaded Succesfully.")
+	AddLog("[DEBUG] slap tool location: "..slap:GetFullName())
 	game.Players.LocalPlayer.Chatted:Connect(function(msg)
 		local args = string.split(msg, " ")
 		print(args[1],args[2])
 		if args[1] == "/fling" then
+			AddLog("[DEBUG] fling command active")
 			if args[2] == nil or args[2] == "" then
 				enablePlayerSelection()
 			elseif args[2] == "all" then
 				for _, player in game.Players:GetPlayers() do
 					if player ~= game.Players.LocalPlayer then
 						if player.Character then
+							AddLog("Flinging "..player.Name)
 							hit(player)
+							task.wait(0.25)
 						end
-					end
-				end
-			elseif args[2] == "random" then
-				local players = game.Players:GetPlayers()
-				if args[3] == nil then
-					args[3] = 1
-				end
-				for i = 1,args[3] do
-				local randomPlayer = players[math.random(1, #players)]
-				if randomPlayer ~= game.Players.LocalPlayer then
-				if randomPlayer.Character then
-					hit(randomPlayer)
-					end
-				end
-				end
-			else
-				for _, player in game.Players:GetPlayers() do
-					if player.Name == args[2] then
-						if player.Character then
-							hit(player)
-						end
-					end
-				end
-			end
-		elseif args[1] == "/kill" then
-			if args[2] == "all" then
-				for _, player in game.Players:GetPlayers() do
-					if player ~= game.Players.LocalPlayer then
-						killslap(player)
 					end
 				end
 			elseif args[2] == "random" then
@@ -286,13 +342,51 @@ if slap ~= nil then
 					local randomPlayer = players[math.random(1, #players)]
 					if randomPlayer ~= game.Players.LocalPlayer then
 						if randomPlayer.Character then
-							killslap(randomPlayer)
+							AddLog("Flinging "..randomPlayer.Name)
+							hit(randomPlayer)
+							task.wait(0.25)
 						end
 					end
 				end
 			else
 				for _, player in game.Players:GetPlayers() do
 					if player.Name == args[2] then
+						if player.Character then
+							hit(player)
+						end
+					end
+				end
+			end
+		elseif args[1] == "/kill" then
+			if args[2] == nil or args[2] == "" then
+				enablePlayerSelectionKill()
+			elseif args[2] == "all" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= game.Players.LocalPlayer then
+						AddLog("Killing "..player.Name)
+						killslap(player)
+						task.wait(0.25)
+					end
+				end
+			elseif args[2] == "random" then
+				local players = game.Players:GetPlayers()
+				if args[3] == nil then
+					args[3] = 1
+				end
+				for i = 1,args[3] do
+					local randomPlayer = players[math.random(1, #players)]
+					if randomPlayer ~= game.Players.LocalPlayer then
+						if randomPlayer.Character then
+							AddLog("Killing "..randomPlayer.Name)
+							killslap(randomPlayer)
+							task.wait(0.25)
+						end
+					end
+				end
+			else
+				for _, player in game.Players:GetPlayers() do
+					if player.Name == args[2] then
+						AddLog("Killing "..player.Name)
 						killslap(player)
 					end
 				end
