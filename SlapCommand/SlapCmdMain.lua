@@ -8,7 +8,8 @@
 --5. https://www.roblox.com/games/110876351628508/Wallhop-Slap-Tower
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
-print("version v 9.6.7")
+--8. https://www.roblox.com/games/80975682515398/EZ-Troll-Tower (you need to wait 5 minutes befor getting slap)
+print("version v 9.6.9")
 local slap = nil
 local selectingPlayer = false
 local mouseConnection = nil
@@ -27,6 +28,7 @@ local flingplus = Instance.new("TextButton")
 local nearby = Instance.new("TextButton")
 local kill = Instance.new("TextButton")
 local fling = Instance.new("TextButton")
+local blacklist = {}
 
 -- Camera orbit variables
 local orbitConnection = nil
@@ -42,6 +44,37 @@ function AddLog(text:string)
 	textlog.Text = text
 	textlog.Parent = Frame
 	game.Debris:AddItem(textlog, 10)
+end
+
+local function Nofiction(text:string)
+	local executor = nil
+	task.spawn(function()
+		executor = identifyexecutor():split(" ")[1]
+		print(executor)
+	end)
+	if executor == nil then executor = "delta" end
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "["..executor.."]",
+		Text = text,
+		Icon = "rbxassetid://105343441215108",
+		Duration = 5
+	})
+end
+
+local function checkBlackList(plrname:string)
+	if table.find(blacklist,plrname) then
+		return true
+	else
+		return false
+	end
+end
+
+local function AddBlackListRemove(plrname:string)
+	if not checkBlackList(plrname) then
+		table.insert(blacklist,plrname)
+	else
+		table.remove(blacklist,table.find(blacklist,plrname))
+	end
 end
 
 function findslap()
@@ -62,25 +95,29 @@ function findslap()
 end
 
 function hit(plr)
-	local args = {
-		"slash",
-		game:GetService("Players"):WaitForChild(plr.Name).Character,
-		Vector3.new(math.random(1,20),10,math.random(1,20))
-	}
-	task.spawn(function()
-		slap.Event:FireServer(unpack(args))
-	end)
+	if not checkBlackList(plr.Name) then
+		local args = {
+			"slash",
+			game:GetService("Players"):WaitForChild(plr.Name).Character,
+			Vector3.new(math.random(1,20),10,math.random(1,20))
+		}
+		task.spawn(function()
+			slap.Event:FireServer(unpack(args))
+		end)
+	end
 end
 
 function killslap(plr)
-	local args = {
-		"slash",
-		game:GetService("Players"):WaitForChild(plr.Name).Character,
-		Vector3.new(10000000,10000000,1000000)
-	}
-	task.spawn(function()
-		slap.Event:FireServer(unpack(args))
-	end)
+	if not checkBlackList(plr.Name) then
+		local args = {
+			"slash",
+			game:GetService("Players"):WaitForChild(plr.Name).Character,
+			Vector3.new(10000000,10000000,1000000)
+		}
+		task.spawn(function()
+			slap.Event:FireServer(unpack(args))
+		end)
+	end
 end
 
 function highlightPlayer(plr)
@@ -359,6 +396,24 @@ end
 _G.startOrbitCameraAroundRandomPlayer = startOrbitCameraAroundRandomPlayer
 _G.stopOrbitCamera = stopOrbitCamera
 
+--[[ PARSING FUNCTION ]]--
+function parseCommand(raw)
+	-- Example: /fling random 5
+	-- Returns: {command="fling", type="random", amount=5}
+	local result = {}
+	local args = string.split(raw, " ")
+	result.command = args[1] and args[1]:gsub("/", "") or ""
+	result.type = args[2] or ""
+	result.amount = tonumber(args[3]) or 1
+	-- Special handling for friends/nonfriends
+	if result.type:lower() == "friends" or result.type:lower() == "freinds" then
+		result.type = "friends"
+	elseif result.type:lower() == "nonfriends" or result.type:lower() == "nonfreinds" then
+		result.type = "nonfriends"
+	end
+	return result
+end
+
 slap = findslap()
 if slap ~= nil then
 
@@ -578,17 +633,22 @@ if slap ~= nil then
 	end)
 
 	AddLog("Loaded Succesfully.")
-	AddLog("[DEBUG] slap tool location: "..slap:GetFullName())
+	AddLog("[DEBUG] slap tool location: game"..slap:GetFullName())
 	game.Players.LocalPlayer.Chatted:Connect(function(msg)
-		local args = string.split(msg, " ")
-		print(args[1],args[2])
-		if args[1] == "/fling" then
+		local parsed = parseCommand(msg)
+		local command = parsed.command
+		local type = parsed.type
+		local amount = parsed.amount
+
+		if command == "fling" then
 			AddLog("[DEBUG] fling command active")
-			if args[2] == nil or args[2] == "" then
+			local localPlayer = game.Players.LocalPlayer
+			if type == "" then
 				enablePlayerSelection()
-			elseif args[2] == "all" then
+			elseif type == "all" then
+				for i = 1, amount do
 				for _, player in game.Players:GetPlayers() do
-					if player ~= game.Players.LocalPlayer then
+					if player ~= localPlayer then
 						if player.Character then
 							AddLog("Flinging "..player.Name)
 							hit(player)
@@ -596,14 +656,12 @@ if slap ~= nil then
 						end
 					end
 				end
-			elseif args[2] == "random" then
-				local players = game.Players:GetPlayers()
-				if args[3] == nil then
-					args[3] = 1
 				end
-				for i = 1,args[3] do
+			elseif type == "random" then
+				local players = game.Players:GetPlayers()
+				for i = 1, amount do
 					local randomPlayer = players[math.random(1, #players)]
-					if randomPlayer ~= game.Players.LocalPlayer then
+					if randomPlayer ~= localPlayer then
 						if randomPlayer.Character then
 							AddLog("Flinging "..randomPlayer.Name)
 							hit(randomPlayer)
@@ -611,35 +669,59 @@ if slap ~= nil then
 						end
 					end
 				end
+			elseif type == "friends" then
+				for _, player in game.Players:GetPlayers() do
+					for i = 1, amount do
+					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Flinging friend "..player.Name)
+							hit(player)
+							task.wait(0.05)
+						end
+					end
+					end
+				end
+			elseif type == "nonfriends" then
+				for i = 1, amount do
+				for _, player in game.Players:GetPlayers() do
+					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Flinging non-friend "..player.Name)
+							hit(player)
+							task.wait(0.05)
+						end
+					end
+				end
+				end
 			else
 				for _, player in game.Players:GetPlayers() do
-					if player.Name == args[2] then
+					if player.Name == type then
 						if player.Character then
+							for i = 1, amount do
 							hit(player)
+							end
 						end
 					end
 				end
 			end
-		elseif args[1] == "/kill" then
+		elseif command == "kill" then
 			AddLog("[DEBUG] kill command active")
-			if args[2] == nil or args[2] == "" then
+			local localPlayer = game.Players.LocalPlayer
+			if type == "" then
 				enablePlayerSelectionKill()
-			elseif args[2] == "all" then
+			elseif type == "all" then
 				for _, player in game.Players:GetPlayers() do
-					if player ~= game.Players.LocalPlayer then
+					if player ~= localPlayer then
 						AddLog("Killing "..player.Name)
 						killslap(player)
 						task.wait(0.05)
 					end
 				end
-			elseif args[2] == "random" then
+			elseif type == "random" then
 				local players = game.Players:GetPlayers()
-				if args[3] == nil then
-					args[3] = 1
-				end
-				for i = 1,args[3] do
+				for i = 1, amount do
 					local randomPlayer = players[math.random(1, #players)]
-					if randomPlayer ~= game.Players.LocalPlayer then
+					if randomPlayer ~= localPlayer then
 						if randomPlayer.Character then
 							AddLog("Killing "..randomPlayer.Name)
 							killslap(randomPlayer)
@@ -647,15 +729,97 @@ if slap ~= nil then
 						end
 					end
 				end
+			elseif type == "friends" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Killing friend "..player.Name)
+							killslap(player)
+							task.wait(0.05)
+						end
+					end
+				end
+			elseif type == "nonfriends" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Killing non-friend "..player.Name)
+							killslap(player)
+							task.wait(0.05)
+						end
+					end
+				end
 			else
 				for _, player in game.Players:GetPlayers() do
-					if player.Name == args[2] then
+					if player.Name == type then
 						AddLog("Killing "..player.Name)
 						killslap(player)
 					end
 				end
 			end
-		elseif args[1] == "/flingselect" then
+		elseif command == "blacklist" then
+			AddLog("[DEBUG] blacklist command active")
+			local localPlayer = game.Players.LocalPlayer
+			if type == "" then
+				Nofiction("Blacklist players")
+				task.wait(0.2)
+				for i,v in blacklist do
+					Nofiction("black list info: "..v)
+					task.wait(0.2)
+				end
+			elseif type == "all" then
+				for _, player in game.Players:GetPlayers() do
+					if player ~= localPlayer then
+						AddLog("Blacklisting "..player.Name)
+						AddBlackListRemove(player.Name)
+						task.wait(0.05)
+					end
+				end
+			elseif type == "random" then
+				local players = game.Players:GetPlayers()
+				for i = 1, amount do
+					local randomPlayer = players[math.random(1, #players)]
+					if randomPlayer ~= localPlayer then
+						if randomPlayer.Character then
+							AddLog("Blacklisting "..randomPlayer.Name)
+							AddBlackListRemove(randomPlayer.Name)
+							task.wait(0.05)
+						end
+					end
+				end
+			elseif type == "friends" then
+				for _, player in game.Players:GetPlayers() do
+					for i = 1, amount do
+					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Blacklisting friend "..player.Name)
+							AddBlackListRemove(player.Name)
+							task.wait(0.05)
+						end
+					end
+					end
+				end
+			elseif type == "nonfriends" then
+				for _, player in game.Players:GetPlayers() do
+					for i = 1, amount do
+					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Blacklisting non-friend "..player.Name)
+							AddBlackListRemove(player.Name)
+							task.wait(0.05)
+						end
+					end
+					end
+				end
+			else
+				for _, player in game.Players:GetPlayers() do
+					if player.Name == type then
+						AddLog("Blacklisting "..player.Name)
+						AddBlackListRemove(player.Name)
+					end
+				end
+			end
+		elseif command == "flingselect" then
 			flingSelectMode = not flingSelectMode
 			if flingSelectMode then
 				killSelectMode = false
@@ -665,7 +829,7 @@ if slap ~= nil then
 				disableFlingSelectMode()
 				print("Fling select mode disabled")
 			end
-		elseif args[1] == "/killselect" then
+		elseif command == "killselect" then
 			killSelectMode = not killSelectMode
 			if killSelectMode then
 				flingSelectMode = false
@@ -675,9 +839,9 @@ if slap ~= nil then
 				disableKillSelectMode()
 				print("Kill select mode disabled")
 			end
-		elseif args[1] == "/orbit" then
+		elseif command == "orbit" then
 			startOrbitCameraAroundRandomPlayer()
-		elseif args[1] == "/stoporbit" then
+		elseif command == "stoporbit" then
 			stopOrbitCamera()
 		end
 	end)
@@ -712,8 +876,9 @@ task.spawn(function()
 				end
 			end
 		end
-		task.wait(0.5)
+		task.wait(0.1)
 	end
 end)
+
 
 
