@@ -9,6 +9,7 @@
 --6. https://www.roblox.com/games/91711653427804/Slap-Tower-7 (but theres like a 5 sceond cooldown for each player to get slap)
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
 --8. https://www.roblox.com/games/80975682515398/EZ-Troll-Tower (you need to wait 5 minutes befor getting slap)
+--9. https://www.roblox.com/games/121052486869800/2
 print("version v 9.7")
 local slap = nil
 local selectingPlayer = false
