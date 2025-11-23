@@ -33,6 +33,8 @@ local fling = Instance.new("TextButton")
 local delaytext = Instance.new("TextBox")
 local cmdbar = Instance.new("TextBox")
 local blacklist = {}
+local whitelist = {}
+local autokilllist = {}
 local sound = Instance.new("Sound")
 sound.SoundId = "rbxassetid://17208361335"
 sound.Volume = 1
@@ -72,6 +74,13 @@ end
 
 local function checkBlackList(plrname:string)
 	if table.find(blacklist,plrname) then
+		return true
+	else
+		return false
+	end
+end
+local function checkWhiteList(plrname:string)
+	if table.find(whitelist,plrname) then
 		return true
 	else
 		return false
@@ -202,10 +211,20 @@ local function AddBlackListRemove(plrname:string)
 	end
 end
 
+local function AddWhiteListRemove(plrname:string)
+	if not checkWhiteList(plrname) then
+		table.insert(whitelist,plrname)
+	else
+		table.remove(whitelist,table.find(whitelist,plrname))
+	end
+end
+
 function findslap()
+	local slaptoolg = nil
 	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
 		if v.Name == "Event" then
 			local slaptool = v.Parent
+			slaptoolg = slaptool
 			print(slaptool.Name)
 			return slaptool
 		end
@@ -213,6 +232,29 @@ function findslap()
 	for i,v in game.Players.LocalPlayer.Backpack:GetDescendants() do
 		if v.Name == "Event" then
 			local slaptool = v.Parent
+			slaptoolg = slaptool
+			print(slaptool.Name)
+			return slaptool
+		end
+	end
+	if slaptoolg == nil and game.PlaceId == 122892536380985 then
+		firetouchinterest(workspace.GearGivers.SilverSlapGiver.MainPart, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
+		wait(0.1)
+		firetouchinterest(workspace.GearGivers.SilverSlapGiver.MainPart, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
+	end
+	task.wait(1)
+	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
+		if v.Name == "Event" then
+			local slaptool = v.Parent
+			slaptoolg = slaptool
+			print(slaptool.Name)
+			return slaptool
+		end
+	end
+	for i,v in game.Players.LocalPlayer.Backpack:GetDescendants() do
+		if v.Name == "Event" then
+			local slaptool = v.Parent
+			slaptoolg = slaptool
 			print(slaptool.Name)
 			return slaptool
 		end
@@ -244,6 +286,39 @@ function killslap(plr)
 		end)
 	end
 end
+
+function autokill(plr:Player)
+	if not table.find(autokilllist, plr.Name) then
+		table.insert(autokilllist, plr.Name)
+
+		task.spawn(function()
+			while task.wait(1) do
+				-- stop if removed from list
+				if not table.find(autokilllist, plr.Name) then
+					break
+				end
+
+				-- rebuild args each tick so respawns are handled
+				if plr.Character and not checkBlackList(plr.Name) then
+					local args = {
+						"slash",
+						plr.Character,
+						Vector3.new(10000000, -10000000, 1000000)
+					}
+					slap.Event:FireServer(unpack(args))
+				end
+			end
+		end)
+	else
+		-- toggle off autokill
+		local idx = table.find(autokilllist, plr.Name)
+		if idx then
+			table.remove(autokilllist, idx)
+		end
+	end
+end
+
+
 
 function highlightPlayer(plr)
 	-- Remove previous highlight
@@ -459,6 +534,27 @@ function disableKillSelectMode()
 	removeInfoBillboard()
 end
 
+function connectconnections()
+	task.wait(3)
+	print("start")
+	print(#whitelist)
+	for i, player in game.Players:GetPlayers() do
+		if table.find(whitelist, player.Name) then
+			print("connected")
+			local connections1 = player.Chatted:Connect(function(msg)
+				print(msg)
+				ConvertStringToCMD(msg,player)
+			end)
+			game.Players.PlayerRemoving:Connect(function(plr)
+				if plr.Name == player.Name then
+					connections1:Disconnect()
+					print("disconnected")
+				end
+			end)
+		end
+	end
+end
+
 -- Camera Orbit Functions
 
 function startOrbitCameraAroundRandomPlayer()
@@ -539,83 +635,131 @@ function parseCommand(raw)
 	return result
 end
 
-function ConvertStringToCMD(text:string)
-	local parsed = parseCommand(text)
-	local command = parsed.command
-	local type = parsed.type
-	local amount = parsed.amount
+-- Global permission state
+local pendingPermission = nil
 
+function ConvertStringToCMD(text:string, sender:Player, skipPermissionCheck:boolean?)
+	local parsed = parseCommand(text)
+	local command, ctype, amount = parsed.command, parsed.type, parsed.amount
+	local localPlayer = game.Players.LocalPlayer
+
+	-- Permission check (only gate others, threshold >= 1000)
+	if not skipPermissionCheck and sender ~= localPlayer and amount >= 300 and command ~= "allow" and command ~= "decline" then
+		pendingPermission = { player = sender, command = parsed }
+		Nofiction("Permission requested by "..sender.Name.." for "..command.." x"..amount..". Type /allow or /decline.")
+		return
+	end
+
+	-- Handle permission responses
+	if command == "allow" then
+		if sender == localPlayer then
+			if pendingPermission then
+				local req = pendingPermission
+				pendingPermission = nil
+				Nofiction("Permission granted for "..req.player.Name.." command "..req.command.command.." x"..req.command.amount)
+				ConvertStringToCMD("/"..req.command.command.." "..(req.command.type or "").." "..(req.command.amount or 1), req.player, true)
+			else
+				Nofiction("No pending request.")
+			end
+		else
+			Nofiction("Only "..localPlayer.Name.." can allow requests.")
+		end
+		return
+	elseif command == "decline" then
+		if sender == localPlayer then
+			if pendingPermission then
+				Nofiction("Permission declined for "..pendingPermission.player.Name.." command "..pendingPermission.command.command)
+				pendingPermission = nil
+			else
+				Nofiction("No pending request.")
+			end
+		else
+			Nofiction("Only "..localPlayer.Name.." can decline requests.")
+		end
+		return
+	end
+
+	-- Commands
 	if command == "fling" then
 		AddLog("[DEBUG] fling command active")
-		local localPlayer = game.Players.LocalPlayer
-		if type == "" then
+		if ctype == "" then
 			enablePlayerSelection()
-		elseif type == "all" then
+		elseif ctype == "all" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			for i = 1, amount do
-				for _, player in game.Players:GetPlayers() do
-					if player ~= localPlayer then
-						if player.Character then
-							AddLog("Flinging "..player.Name)
-							hit(player)
-							task.wait(0.05)
+				task.spawn(function()
+					for _, player in game.Players:GetPlayers() do
+						if player ~= localPlayer then
+							task.spawn(function()
+								if player.Character then
+									AddLog("Flinging "..player.Name)
+									hit(player)
+								end
+							end)
 						end
+						task.wait(0.02)
 					end
-				end
+				end)
 			end
-		elseif type == "random" then
+		elseif ctype == "random" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			local players = game.Players:GetPlayers()
 			for i = 1, amount do
-				local randomPlayer = players[math.random(1, #players)]
-				if randomPlayer ~= localPlayer then
-					if randomPlayer.Character then
-						AddLog("Flinging "..randomPlayer.Name)
-						hit(randomPlayer)
-						task.wait(0.05)
+				task.spawn(function()
+					local randomPlayer = players[math.random(1, #players)]
+					if randomPlayer ~= localPlayer then
+						if randomPlayer.Character then
+							AddLog("Flinging "..randomPlayer.Name)
+							hit(randomPlayer)
+						end
+						task.wait(0.02)
 					end
-				end
+				end)
 			end
-		elseif type == "friends" then
+		elseif ctype == "friends" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			for _, player in game.Players:GetPlayers() do
 				for i = 1, amount do
-					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
-						if player.Character then
-							AddLog("Flinging friend "..player.Name)
-							hit(player)
-							task.wait(0.05)
+					task.spawn(function()
+						if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+							if player.Character then
+								AddLog("Flinging friend "..player.Name)
+								hit(player)
+							end
 						end
-					end
+						task.wait(0.05)
+					end)
 				end
 			end
-		elseif type == "nonfriends" then
+		elseif ctype == "nonfriends" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			for i = 1, amount do
-				for _, player in game.Players:GetPlayers() do
-					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
-						if player.Character then
-							AddLog("Flinging non-friend "..player.Name)
-							hit(player)
-							task.wait(0.05)
+				task.spawn(function()
+					for _, player in game.Players:GetPlayers() do
+						if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+							if player.Character then
+								AddLog("Flinging non-friend "..player.Name)
+								hit(player)
+							end
+							task.wait()
 						end
 					end
-				end
+				end)
 			end
 		else
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			for _, player in game.Players:GetPlayers() do
-				if player.Name == type then
+				if player.Name == ctype then
 					if player.Character then
 						for i = 1, amount do
 							hit(player)
@@ -624,12 +768,12 @@ function ConvertStringToCMD(text:string)
 				end
 			end
 		end
+
 	elseif command == "kill" then
 		AddLog("[DEBUG] kill command active")
-		local localPlayer = game.Players.LocalPlayer
-		if type == "" then
+		if ctype == "" then
 			enablePlayerSelectionKill()
-		elseif type == "all" then
+		elseif ctype == "all" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
@@ -637,10 +781,10 @@ function ConvertStringToCMD(text:string)
 				if player ~= localPlayer then
 					AddLog("Killing "..player.Name)
 					killslap(player)
-					task.wait(0.05)
+					task.wait()
 				end
 			end
-		elseif type == "random" then
+		elseif ctype == "random" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
@@ -655,7 +799,7 @@ function ConvertStringToCMD(text:string)
 					end
 				end
 			end
-		elseif type == "friends" then
+		elseif ctype == "friends" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
@@ -668,7 +812,7 @@ function ConvertStringToCMD(text:string)
 					end
 				end
 			end
-		elseif type == "nonfriends" then
+		elseif ctype == "nonfriends" then
 			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
 				CreateTimer(tonumber(delaytext.Text))
 			end
@@ -686,23 +830,94 @@ function ConvertStringToCMD(text:string)
 				CreateTimer(tonumber(delaytext.Text))
 			end
 			for _, player in game.Players:GetPlayers() do
-				if player.Name == type then
+				if player.Name == ctype then
 					AddLog("Killing "..player.Name)
 					killslap(player)
 				end
 			end
 		end
+
+	elseif command == "autokill" then
+		AddLog("[DEBUG] autokill command active")
+		if ctype == "" then
+			Nofiction("auto kill list:")
+			for i, v in ipairs(autokilllist) do
+				Nofiction(i..". "..v)
+			end
+		elseif ctype == "all" then
+			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+				CreateTimer(tonumber(delaytext.Text))
+			end
+			for _, player in game.Players:GetPlayers() do
+				if player ~= localPlayer then
+					AddLog("loop Killing "..player.Name)
+					autokill(player)
+					task.wait(0.05)
+				end
+			end
+		elseif ctype == "random" then
+			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+				CreateTimer(tonumber(delaytext.Text))
+			end
+			local players = game.Players:GetPlayers()
+			for i = 1, amount do
+				local randomPlayer = players[math.random(1, #players)]
+				if randomPlayer ~= localPlayer then
+					if randomPlayer.Character then
+						AddLog("loop Killing "..randomPlayer.Name)
+						autokill(randomPlayer)
+						task.wait(0.05)
+					end
+				end
+			end
+		elseif ctype == "friends" then
+			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+				CreateTimer(tonumber(delaytext.Text))
+			end
+			for _, player in game.Players:GetPlayers() do
+				if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+					if player.Character then
+						AddLog("loop Killing friend "..player.Name)
+						autokill(player)
+						task.wait(0.05)
+					end
+				end
+			end
+		elseif ctype == "nonfriends" then
+			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+				CreateTimer(tonumber(delaytext.Text))
+			end
+			for _, player in game.Players:GetPlayers() do
+				if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+					if player.Character then
+						AddLog("loop Killing non-friend "..player.Name)
+						autokill(player)
+						task.wait(0.05)
+					end
+				end
+			end
+		else
+			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+				CreateTimer(tonumber(delaytext.Text))
+			end
+			for _, player in game.Players:GetPlayers() do
+				if player.Name == ctype then
+					AddLog("loop Killing "..player.Name)
+					autokill(player)
+				end
+			end
+		end
+
 	elseif command == "blacklist" then
 		AddLog("[DEBUG] blacklist command active")
-		local localPlayer = game.Players.LocalPlayer
-		if type == "" then
+		if ctype == "" then
 			Nofiction("Blacklist players")
 			task.wait(0.2)
-			for i,v in blacklist do
+			for i, v in ipairs(blacklist) do
 				Nofiction("black list info: "..v)
 				task.wait(0.2)
 			end
-		elseif type == "all" then
+		elseif ctype == "all" then
 			for _, player in game.Players:GetPlayers() do
 				if player ~= localPlayer then
 					AddLog("Blacklisting "..player.Name)
@@ -710,7 +925,7 @@ function ConvertStringToCMD(text:string)
 					task.wait(0.05)
 				end
 			end
-		elseif type == "random" then
+		elseif ctype == "random" then
 			local players = game.Players:GetPlayers()
 			for i = 1, amount do
 				local randomPlayer = players[math.random(1, #players)]
@@ -722,7 +937,7 @@ function ConvertStringToCMD(text:string)
 					end
 				end
 			end
-		elseif type == "friends" then
+		elseif ctype == "friends" then
 			for _, player in game.Players:GetPlayers() do
 				for i = 1, amount do
 					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
@@ -734,7 +949,7 @@ function ConvertStringToCMD(text:string)
 					end
 				end
 			end
-		elseif type == "nonfriends" then
+		elseif ctype == "nonfriends" then
 			for _, player in game.Players:GetPlayers() do
 				for i = 1, amount do
 					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
@@ -748,12 +963,83 @@ function ConvertStringToCMD(text:string)
 			end
 		else
 			for _, player in game.Players:GetPlayers() do
-				if player.Name == type then
+				if player.Name == ctype then
 					AddLog("Blacklisting "..player.Name)
 					AddBlackListRemove(player.Name)
 				end
 			end
 		end
+
+	elseif command == "whitelist" then
+		AddLog("[DEBUG] whitelist command active")
+		task.spawn(function()
+			connectconnections()
+		end)
+		if ctype == "" then
+			Nofiction("Whitelist players")
+			task.wait(0.2)
+			for i, v in ipairs(whitelist) do
+				Nofiction("white list info: "..v)
+				task.wait(0.2)
+			end
+		elseif ctype == "all" then
+			for _, player in game.Players:GetPlayers() do
+				if player ~= localPlayer then
+					AddLog("Whitelisting "..player.Name)
+					AddWhiteListRemove(player.Name)
+					AddBlackListRemove(player.Name)
+					task.wait(0.05)
+				end
+			end
+		elseif ctype == "random" then
+			local players = game.Players:GetPlayers()
+			for i = 1, amount do
+				local randomPlayer = players[math.random(1, #players)]
+				if randomPlayer ~= localPlayer then
+					if randomPlayer.Character then
+						AddLog("Whitelisting "..randomPlayer.Name)
+						AddWhiteListRemove(randomPlayer.Name)
+						AddBlackListRemove(randomPlayer.Name)
+						task.wait(0.05)
+					end
+				end
+			end
+		elseif ctype == "friends" then
+			for _, player in game.Players:GetPlayers() do
+				for i = 1, amount do
+					if player ~= localPlayer and localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Whitelisting friend "..player.Name)
+							AddWhiteListRemove(player.Name)
+							AddBlackListRemove(player.Name)
+							task.wait(0.05)
+						end
+					end
+				end
+			end
+		elseif ctype == "nonfriends" then
+			for _, player in game.Players:GetPlayers() do
+				for i = 1, amount do
+					if player ~= localPlayer and not localPlayer:IsFriendsWith(player.UserId) then
+						if player.Character then
+							AddLog("Whitelisting non-friend "..player.Name)
+							AddWhiteListRemove(player.Name)
+							AddBlackListRemove(player.Name)
+							task.wait(0.05)
+						end
+					end
+				end
+			end
+		else
+			for _, player in game.Players:GetPlayers() do
+				if player.Name == ctype then
+					AddLog("Whitelisting "..player.Name)
+					AddWhiteListRemove(player.Name)
+					AddBlackListRemove(player.Name)
+				end
+			end
+		end
+
 	elseif command == "flingselect" then
 		flingSelectMode = not flingSelectMode
 		if flingSelectMode then
@@ -764,6 +1050,7 @@ function ConvertStringToCMD(text:string)
 			disableFlingSelectMode()
 			print("Fling select mode disabled")
 		end
+
 	elseif command == "killselect" then
 		killSelectMode = not killSelectMode
 		if killSelectMode then
@@ -774,12 +1061,15 @@ function ConvertStringToCMD(text:string)
 			disableKillSelectMode()
 			print("Kill select mode disabled")
 		end
+
 	elseif command == "orbit" then
 		startOrbitCameraAroundRandomPlayer()
+
 	elseif command == "stoporbit" then
 		stopOrbitCamera()
 	end
 end
+
 
 slap = findslap()
 if slap ~= nil then
@@ -788,6 +1078,8 @@ if slap ~= nil then
 	SlapLogs.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 	SlapLogs.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	SlapLogs.DisplayOrder = 999999999
+	SlapLogs.ResetOnSpawn = false
+	SlapLogs.IgnoreGuiInset = true
 
 	Frame.Parent = SlapLogs
 	Frame.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
@@ -900,7 +1192,7 @@ if slap ~= nil then
 	delaytext.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
 	delaytext.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	delaytext.BorderSizePixel = 0
-	delaytext.Position = UDim2.new(0, 0, 0.499384582, 0)
+	delaytext.Position = UDim2.new(0, 0,0.505, 0)
 	delaytext.Size = UDim2.new(1, 0, 0.0909999982, 0)
 	delaytext.ClearTextOnFocus = false
 	delaytext.Font = Enum.Font.SourceSans
@@ -911,7 +1203,7 @@ if slap ~= nil then
 	delaytext.TextScaled = true
 	delaytext.TextSize = 14.000
 	delaytext.TextWrapped = true
-	
+
 	cmdbar.Name = "cmdbar"
 	cmdbar.Parent = SlapLogs
 	cmdbar.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
@@ -928,7 +1220,7 @@ if slap ~= nil then
 	cmdbar.TextScaled = true
 	cmdbar.TextSize = 14.000
 	cmdbar.TextWrapped = true
-	
+
 	flingplus.MouseButton1Click:Connect(function()
 		task.spawn(function()
 			AddLog("[DEBUG] flingplus command active")
@@ -1043,16 +1335,17 @@ if slap ~= nil then
 	end)
 
 	AddLog("Loaded Succesfully.")
-	AddLog("[DEBUG] slap tool location: game"..slap:GetFullName())
+	AddLog("[DEBUG] slap tool location: game."..slap:GetFullName())
 	game.Players.LocalPlayer.Chatted:Connect(function(msg)
-		ConvertStringToCMD(msg)
+		ConvertStringToCMD(msg,game.Players.LocalPlayer)
 	end)
 end
+
 cmdbar.FocusLost:Connect(function(enter)
 	if enter then
 		print(cmdbar.Text)
 		task.spawn(function()
-		ConvertStringToCMD(cmdbar.Text)
+			ConvertStringToCMD(cmdbar.Text)
 		end)
 		cmdbar.Text = ""
 	end
@@ -1089,3 +1382,4 @@ task.spawn(function()
 		task.wait(0.1)
 	end
 end)
+
