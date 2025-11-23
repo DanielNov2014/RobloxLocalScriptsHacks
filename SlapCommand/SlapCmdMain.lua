@@ -10,6 +10,7 @@
 --7. https://www.roblox.com/games/104002488192102/Omega-Troll-Slap-Tower
 --8. https://www.roblox.com/games/80975682515398/EZ-Troll-Tower (you need to wait 5 minutes befor getting slap)
 --9. https://www.roblox.com/games/121052486869800/2
+--10. https://www.roblox.com/games/122892536380985/No-Jumping-Tower
 print("version v 9.7")
 local slap = nil
 local selectingPlayer = false
