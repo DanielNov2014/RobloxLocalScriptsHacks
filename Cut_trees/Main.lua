@@ -13,7 +13,7 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
 	Name = "Rayfield Example Window",
 	Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
-	LoadingTitle = "Cute trees farm",
+	LoadingTitle = "cut trees farm [BETA] v 1.1",
 	LoadingSubtitle = "by DaniBoyNov2014",
 	Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
