@@ -5,7 +5,7 @@
 --	}
 --	game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("Tree"):FireServer(unpack(args))
 --end
---script
+--script: loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/Cut_trees/Main.lua",true))()
 debugX = true
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -133,10 +133,38 @@ local Button2 = Tab:CreateButton({
 	end,
 })
 local function Getchesttype()
-	if game:GetService("Players").LocalPlayer.PlayerGui.ChestOpening.Header.ChestName.Text == "Old Chest" then
+	local name = game:GetService("Players").LocalPlayer.PlayerGui.ChestOpening.Header.ChestName.Text
+	if name == "Old Chest" then
 		return 1
+	elseif name == "Deep Dark Chest" then
+		return 12
+	elseif name == "Deep Chest" then
+		return 10
+	elseif name == "Dark Chest" then
+		return 11
+	elseif name == "Basic Chest" then
+		return 2
+	elseif name == "Frozen Chest" then
+		return 3
+	elseif name == "Golden Chest" then
+		return 5
+	elseif name == "Bone Chest" then
+		return 7
+	elseif name == "Lava Chest" then
+		return 8
+	elseif name == "Horns Chest" then
+		return 9
 	end
 end
+
+local function IsLocked()
+	if game:GetService("Players").LocalPlayer.PlayerGui.ChestOpening.Lock.Visible == true then
+		return true
+	else
+		return false
+	end
+end
+
 local function GetChestsLeft()
 	local count = 0
 	for i,v in game:GetService("Players").LocalPlayer.PlayerGui.ChestOpening.Chests.ScrollingFrame:GetChildren() do
