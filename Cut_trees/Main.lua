@@ -178,13 +178,50 @@ local Button3 = Tab:CreateButton({
 	Name = "Open all of the chests",
 	Callback = function()
 		repeat 
-		if Getchesttype() == 1 then
-			local args = {
-				"Open",
-				"Chest1"
-			}
-			game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("ChestFunction"):InvokeServer(unpack(args))
-		end
+			if Getchesttype() == 1 then
+				local args = {
+					"Open",
+					"Chest1"
+				}
+				game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("ChestFunction"):InvokeServer(unpack(args))
+			elseif Getchesttype() == 3 then
+				local args = {
+					"Open",
+					"Chest3_Huge"
+				}
+				game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("ChestFunction"):InvokeServer(unpack(args))
+			elseif Getchesttype() == 7 then
+				if IsLocked() == false then
+					local args = {
+						"Open",
+						"Chest7_Huge"
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("ChestFunction"):InvokeServer(unpack(args))
+				else
+					local args = {
+						"Discard",
+						"Chest7_Huge"
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("Chest"):FireServer(unpack(args))
+
+				end
+			elseif Getchesttype() == 8 then
+				if IsLocked() == false then
+					local args = {
+						"Open",
+						"Chest8_Huge"
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("ChestFunction"):InvokeServer(unpack(args))
+				else
+					local args = {
+						"Discard",
+						"Chest8_Huge"
+					}
+					game:GetService("ReplicatedStorage"):WaitForChild("Signal"):WaitForChild("Chest"):FireServer(unpack(args))
+
+				end
+			end
+			task.wait(0.1)
 		until GetChestsLeft() == 0
 		Rayfield:Notify({
 			Title = "Succes ✅",
