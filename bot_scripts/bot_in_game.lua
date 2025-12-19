@@ -1,3 +1,5 @@
+
+
 local function reset()
 	local HttpService = game:GetService("HttpService")
 
@@ -41,6 +43,35 @@ task.spawn(function()
 end)
 task.delay(120,function()
 	Chat("gotta go")
+	queue_on_teleport([[
+		while task.wait(20) do
+	if _G.Loaded == true then
+		task.wait(math.huge)
+	end
+	_G.Loaded = true
+	if game.PlaceId == 92175551837230 then
+	local HttpService = game:GetService("HttpService")
+
+	local url = "https://DanielNov2014alt.pythonanywhere.com/get"
+
+	local success, response = pcall(function()
+		return game:HttpGet(url)
+	end)
+
+	if success then
+		local decoded = HttpService:JSONDecode(response)
+		print("Current value2 is:", decoded.value2)
+	else
+		warn("Error fetching value2:", response)
+	end
+	local decoded = HttpService:JSONDecode(response)
+	if decoded.value2 ~= 0 then
+		game["Teleport Service"]:Teleport(decoded.value2)
+		queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/bot_scripts/bot_in_game.lua))()')
+	end
+	end
+end
+	]])
 	game["Teleport Service"]:Teleport(95551312148536)
 	task.wait(5)
 	game:Shutdown()
