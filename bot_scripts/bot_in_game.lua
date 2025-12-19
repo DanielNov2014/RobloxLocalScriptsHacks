@@ -100,7 +100,7 @@ task.spawn(function()
 end)
 
 -- Ensure teleport persistence is queued safely
-task.delay(5, function()
+task.delay(120, function()
     Chat("gotta go")
 
     -- Build the code we want to queue (as a string). Keep it minimal and guarded.
@@ -142,7 +142,7 @@ task.delay(5, function()
     local suc, err = pcall(function() TeleportService:Teleport(92175551837230) end)
     if not suc then warn("Teleport failed:", err) end
 
-    task.wait(5)
+    task.wait(15)
     pcall(function() game:Shutdown() end)
 end)
 
