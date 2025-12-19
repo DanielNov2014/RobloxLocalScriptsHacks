@@ -72,7 +72,7 @@ task.delay(120,function()
 	end
 end
 	]])
-	game["Teleport Service"]:Teleport(95551312148536)
+	game["Teleport Service"]:Teleport(92175551837230)
 	task.wait(5)
 	game:Shutdown()
 end)
