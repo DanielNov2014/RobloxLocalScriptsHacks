@@ -100,40 +100,24 @@ task.spawn(function()
 end)
 
 -- Ensure teleport persistence is queued safely
-task.delay(120, function()
+task.delay(5, function()
     Chat("gotta go")
 
     -- Build the code we want to queue (as a string). Keep it minimal and guarded.
-    local queuedCode = [[
-        -- queued code: check guards before calling functions
-        if type(queue_on_teleport) ~= "function" then
-            -- queue_on_teleport not available here; bail
-            return
-        end
-  local queuedCode = [[
-    -- queued code: check guards before calling functions
-    if type(queue_on_teleport) ~= "function" then
-        -- queue_on_teleport not available here; bail
-        return
-    end
-    if _G.Loaded == true then
-        task.wait(math.huge)
-    end
+   local queuedCode = [[
+    if type(queue_on_teleport) ~= "function" then return end
+    if _G.Loaded == true then task.wait(math.huge) end
     while task.wait(20) do
         _G.Loaded = true
-
         if game.PlaceId == 92175551837230 then
             local HttpService = game:GetService("HttpService")
             local url = "https://DanielNov2014alt.pythonanywhere.com/get"
-
             local success, response = pcall(function()
                 return game:HttpGet(url)
             end)
-
             if success then
                 local decoded = HttpService:JSONDecode(response)
                 print("Current value2 is:", decoded.value2)
-
                 if decoded.value2 ~= 0 then
                     queue_on_teleport('print("hi") task.wait(3) loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/bot_scripts/bot_in_game.lua"))()')
                     game:GetService("TeleportService"):Teleport(decoded.value2)
@@ -144,6 +128,7 @@ task.delay(120, function()
         end
     end
 ]]
+
 
     -- Try to use queue_on_teleport if present
     local queued_ok = safe_queue_on_teleport(queuedCode)
