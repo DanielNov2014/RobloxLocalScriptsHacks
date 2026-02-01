@@ -12,6 +12,7 @@
 --9. https://www.roblox.com/games/121052486869800/2
 --10. https://www.roblox.com/games/122892536380985/No-Jumping-Tower
 --11. https://www.roblox.com/games/128645205119047/Troll-Is-Not-A-Pinning-Tower
+--12. https://www.roblox.com/games/126513482036840/unnamed (you need to wait 5 minutes before getting slap)
 print("version v 9.7")
 local slap = nil
 local selectingPlayer = false
