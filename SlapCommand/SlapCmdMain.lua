@@ -34,6 +34,7 @@ local kill = Instance.new("TextButton")
 local fling = Instance.new("TextButton")
 local delaytext = Instance.new("TextBox")
 local cmdbar = Instance.new("TextBox")
+local slaptext = Instance.new("TextButton")
 local blacklist = {}
 local whitelist = {}
 local autokilllist = {}
@@ -222,45 +223,48 @@ local function AddWhiteListRemove(plrname:string)
 end
 
 function findslap()
-	local slaptoolg = nil
-	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
-		if v.Name == "Event" then
-			local slaptool = v.Parent
-			slaptoolg = slaptool
-			print(slaptool.Name)
-			return slaptool
+	local function searchForEvent(parent)
+		for _, v in ipairs(parent:GetDescendants()) do
+			if v.Name == "Event" and v:IsA("RemoteEvent") then
+				return v.Parent
+			end
+		end
+		return nil
+	end
+
+	-- Priority 1: Check LocalPlayer
+	local localPlr = game.Players.LocalPlayer
+	local slaptool = searchForEvent(localPlr.Character or localPlr.CharacterAdded:Wait()) or searchForEvent(localPlr.Backpack)
+
+	if slaptool then return slaptool end
+
+	-- Priority 2: Game-specific check (Silver Slap Giver)
+	if game.PlaceId == 122892536380985 then
+		local giver = workspace:FindFirstChild("GearGivers") and workspace.GearGivers:FindFirstChild("SilverSlapGiver")
+		if giver then
+			firetouchinterest(giver.MainPart, localPlr.Character.HumanoidRootPart, 1)
+			task.wait(0.1)
+			firetouchinterest(giver.MainPart, localPlr.Character.HumanoidRootPart, 0)
+			task.wait(0.5) -- Wait for tool to be given
+			slaptool = searchForEvent(localPlr.Backpack)
+			if slaptool then return slaptool end
 		end
 	end
-	for i,v in game.Players.LocalPlayer.Backpack:GetDescendants() do
-		if v.Name == "Event" then
-			local slaptool = v.Parent
-			slaptoolg = slaptool
-			print(slaptool.Name)
-			return slaptool
+
+	-- Priority 3: "Steal" from other players
+	AddLog("No slap found. Searching other players for a tool to 'steal'...")
+	for _, otherPlr in ipairs(game.Players:GetPlayers()) do
+		if otherPlr ~= localPlr and otherPlr.Character then
+			slaptool = searchForEvent(otherPlr.Character) or searchForEvent(otherPlr.Backpack)
+			if slaptool then
+				AddLog("Found slap tool in " .. otherPlr.Name .. "'s inventory.")
+				return slaptool
+			end
 		end
 	end
-	if slaptoolg == nil and game.PlaceId == 122892536380985 then
-		firetouchinterest(workspace.GearGivers.SilverSlapGiver.MainPart, game.Players.LocalPlayer.Character.HumanoidRootPart, 1)
-		wait(0.1)
-		firetouchinterest(workspace.GearGivers.SilverSlapGiver.MainPart, game.Players.LocalPlayer.Character.HumanoidRootPart, 0)
-	end
-	task.wait(1)
-	for i,v in workspace[game.Players.LocalPlayer.Name]:GetDescendants() do
-		if v.Name == "Event" then
-			local slaptool = v.Parent
-			slaptoolg = slaptool
-			print(slaptool.Name)
-			return slaptool
-		end
-	end
-	for i,v in game.Players.LocalPlayer.Backpack:GetDescendants() do
-		if v.Name == "Event" then
-			local slaptool = v.Parent
-			slaptoolg = slaptool
-			print(slaptool.Name)
-			return slaptool
-		end
-	end
+
+	AddLog("Error: No slap tool found in the server.")
+	return nil
 end
 
 function hit(plr)
@@ -1072,276 +1076,298 @@ function ConvertStringToCMD(text:string, sender:Player, skipPermissionCheck:bool
 	end
 end
 
+task.spawn(function()
+	slap = findslap()
+end)
 
-slap = findslap()
-if slap ~= nil then
 
-	SlapLogs.Name = "SlapLogs"
-	SlapLogs.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-	SlapLogs.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	SlapLogs.DisplayOrder = 999999999
-	SlapLogs.ResetOnSpawn = false
-	SlapLogs.IgnoreGuiInset = true
+SlapLogs.Name = "SlapLogs"
+SlapLogs.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+SlapLogs.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+SlapLogs.DisplayOrder = 999999999
+SlapLogs.ResetOnSpawn = false
+SlapLogs.IgnoreGuiInset = true
 
-	Frame.Parent = SlapLogs
-	Frame.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
-	Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Frame.BorderSizePixel = 0
-	Frame.Position = UDim2.new(0.0194444451, 0, 0.692889571, 0)
-	Frame.Size = UDim2.new(0.3, 0, 0.290468991, 0)
-	Frame.ZIndex = 999999
+Frame.Parent = SlapLogs
+Frame.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.0194444451, 0, 0.692889571, 0)
+Frame.Size = UDim2.new(0.3, 0, 0.290468991, 0)
+Frame.ZIndex = 999999
 
-	UIListLayout.Parent = Frame
-	UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Parent = Frame
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-	TextLabel.Name = "Example_text"
-	TextLabel.Parent = Frame
-	TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel.BackgroundTransparency = 1.000
-	TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	TextLabel.BorderSizePixel = 0
-	TextLabel.Size = UDim2.new(1, 0, 0.0885416642, 0)
-	TextLabel.Font = Enum.Font.SourceSans
-	TextLabel.Text = "Loaded Succesfully"
-	TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-	TextLabel.TextScaled = true
-	TextLabel.TextSize = 14.000
-	TextLabel.TextWrapped = true
-	TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-	TextLabel.Visible = false
+TextLabel.Name = "Example_text"
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextLabel.BorderSizePixel = 0
+TextLabel.Size = UDim2.new(1, 0, 0.0885416642, 0)
+TextLabel.Font = Enum.Font.SourceSans
+TextLabel.Text = "Loaded Succesfully"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.TextSize = 14.000
+TextLabel.TextWrapped = true
+TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+TextLabel.Visible = false
 
-	QuickCommands.Name = "QuickCommands"
-	QuickCommands.Parent = SlapLogs
-	QuickCommands.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
-	QuickCommands.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	QuickCommands.BorderSizePixel = 0
-	QuickCommands.Position = UDim2.new(0.330555558, 0, 0.691376686, 0)
-	QuickCommands.Size = UDim2.new(0.144444451, 0, 0.291981846, 0)
-	QuickCommands.ZIndex = 999999
+QuickCommands.Name = "QuickCommands"
+QuickCommands.Parent = SlapLogs
+QuickCommands.BackgroundColor3 = Color3.fromRGB(27, 27, 27)
+QuickCommands.BorderColor3 = Color3.fromRGB(0, 0, 0)
+QuickCommands.BorderSizePixel = 0
+QuickCommands.Position = UDim2.new(0.330555558, 0, 0.691376686, 0)
+QuickCommands.Size = UDim2.new(0.144444451, 0, 0.291981846, 0)
+QuickCommands.ZIndex = 999999
+QuickCommands.Visible = false
 
-	Title.Name = "Title"
-	Title.Parent = QuickCommands
-	Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	Title.BackgroundTransparency = 1.000
-	Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	Title.BorderSizePixel = 0
-	Title.Size = UDim2.new(1, 0, 0.119629756, 0)
-	Title.Font = Enum.Font.SourceSans
-	Title.Text = "Quick commands"
-	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-	Title.TextScaled = true
-	Title.TextSize = 14.000
-	Title.TextWrapped = true
+Title.Name = "Title"
+Title.Parent = QuickCommands
+Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1.000
+Title.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Title.BorderSizePixel = 0
+Title.Size = UDim2.new(1, 0, 0.119629756, 0)
+Title.Font = Enum.Font.SourceSans
+Title.Text = "Quick commands"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextScaled = true
+Title.TextSize = 14.000
+Title.TextWrapped = true
 
-	flingplus.Name = "flingplus"
-	flingplus.Parent = QuickCommands
-	flingplus.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	flingplus.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	flingplus.BorderSizePixel = 0
-	flingplus.Position = UDim2.new(0, 0, 0.417098433, 0)
-	flingplus.Size = UDim2.new(1, 0, 0.0906735733, 0)
-	flingplus.Font = Enum.Font.SourceSans
-	flingplus.Text = "fling all out of the obby"
-	flingplus.TextColor3 = Color3.fromRGB(0, 0, 0)
-	flingplus.TextScaled = true
-	flingplus.TextSize = 14.000
-	flingplus.TextWrapped = true
+flingplus.Name = "flingplus"
+flingplus.Parent = QuickCommands
+flingplus.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+flingplus.BorderColor3 = Color3.fromRGB(0, 0, 0)
+flingplus.BorderSizePixel = 0
+flingplus.Position = UDim2.new(0, 0, 0.417098433, 0)
+flingplus.Size = UDim2.new(1, 0, 0.0906735733, 0)
+flingplus.Font = Enum.Font.SourceSans
+flingplus.Text = "fling all out of the obby"
+flingplus.TextColor3 = Color3.fromRGB(0, 0, 0)
+flingplus.TextScaled = true
+flingplus.TextSize = 14.000
+flingplus.TextWrapped = true
 
-	nearby.Name = "nearby"
-	nearby.Parent = QuickCommands
-	nearby.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	nearby.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	nearby.BorderSizePixel = 0
-	nearby.Position = UDim2.new(0, 0, 0.326424867, 0)
-	nearby.Size = UDim2.new(1, 0, 0.0906735733, 0)
-	nearby.Font = Enum.Font.SourceSans
-	nearby.Text = "fling nearby players (ON)"
-	nearby.TextColor3 = Color3.fromRGB(0, 0, 0)
-	nearby.TextScaled = true
-	nearby.TextSize = 14.000
-	nearby.TextWrapped = true
+nearby.Name = "nearby"
+nearby.Parent = QuickCommands
+nearby.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+nearby.BorderColor3 = Color3.fromRGB(0, 0, 0)
+nearby.BorderSizePixel = 0
+nearby.Position = UDim2.new(0, 0, 0.326424867, 0)
+nearby.Size = UDim2.new(1, 0, 0.0906735733, 0)
+nearby.Font = Enum.Font.SourceSans
+nearby.Text = "fling nearby players (ON)"
+nearby.TextColor3 = Color3.fromRGB(0, 0, 0)
+nearby.TextScaled = true
+nearby.TextSize = 14.000
+nearby.TextWrapped = true
 
-	kill.Name = "kill"
-	kill.Parent = QuickCommands
-	kill.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	kill.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	kill.BorderSizePixel = 0
-	kill.Position = UDim2.new(0, 0, 0.235751301, 0)
-	kill.Size = UDim2.new(1, 0, 0.0906735733, 0)
-	kill.Font = Enum.Font.SourceSans
-	kill.Text = "kill all"
-	kill.TextColor3 = Color3.fromRGB(0, 0, 0)
-	kill.TextScaled = true
-	kill.TextSize = 14.000
-	kill.TextWrapped = true
+kill.Name = "kill"
+kill.Parent = QuickCommands
+kill.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+kill.BorderColor3 = Color3.fromRGB(0, 0, 0)
+kill.BorderSizePixel = 0
+kill.Position = UDim2.new(0, 0, 0.235751301, 0)
+kill.Size = UDim2.new(1, 0, 0.0906735733, 0)
+kill.Font = Enum.Font.SourceSans
+kill.Text = "kill all"
+kill.TextColor3 = Color3.fromRGB(0, 0, 0)
+kill.TextScaled = true
+kill.TextSize = 14.000
+kill.TextWrapped = true
 
-	fling.Name = "fling"
-	fling.Parent = QuickCommands
-	fling.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	fling.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	fling.BorderSizePixel = 0
-	fling.Position = UDim2.new(0, 0, 0.14507772, 0)
-	fling.Size = UDim2.new(1, 0, 0.0906735733, 0)
-	fling.Font = Enum.Font.SourceSans
-	fling.Text = "fling all"
-	fling.TextColor3 = Color3.fromRGB(0, 0, 0)
-	fling.TextScaled = true
-	fling.TextSize = 14.000
-	fling.TextWrapped = true
+fling.Name = "fling"
+fling.Parent = QuickCommands
+fling.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+fling.BorderColor3 = Color3.fromRGB(0, 0, 0)
+fling.BorderSizePixel = 0
+fling.Position = UDim2.new(0, 0, 0.14507772, 0)
+fling.Size = UDim2.new(1, 0, 0.0906735733, 0)
+fling.Font = Enum.Font.SourceSans
+fling.Text = "fling all"
+fling.TextColor3 = Color3.fromRGB(0, 0, 0)
+fling.TextScaled = true
+fling.TextSize = 14.000
+fling.TextWrapped = true
 
-	delaytext.Name = "delaytext"
-	delaytext.Parent = QuickCommands
-	delaytext.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	delaytext.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	delaytext.BorderSizePixel = 0
-	delaytext.Position = UDim2.new(0, 0,0.505, 0)
-	delaytext.Size = UDim2.new(1, 0, 0.0909999982, 0)
-	delaytext.ClearTextOnFocus = false
-	delaytext.Font = Enum.Font.SourceSans
-	delaytext.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
-	delaytext.PlaceholderText = "enter delay for commands"
-	delaytext.Text = ""
-	delaytext.TextColor3 = Color3.fromRGB(0, 0, 0)
-	delaytext.TextScaled = true
-	delaytext.TextSize = 14.000
-	delaytext.TextWrapped = true
 
-	cmdbar.Name = "cmdbar"
-	cmdbar.Parent = SlapLogs
-	cmdbar.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
-	cmdbar.BorderColor3 = Color3.fromRGB(0, 0, 0)
-	cmdbar.BorderSizePixel = 0
-	cmdbar.Position = UDim2.new(0.869357884, 0, 0.472873449, 0)
-	cmdbar.Size = UDim2.new(0.130642101, 0, 0.13606891, 0)
-	cmdbar.ClearTextOnFocus = false
-	cmdbar.Font = Enum.Font.SourceSans
-	cmdbar.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
-	cmdbar.PlaceholderText = "command bar"
-	cmdbar.Text = ""
-	cmdbar.TextColor3 = Color3.fromRGB(0, 0, 0)
-	cmdbar.TextScaled = true
-	cmdbar.TextSize = 14.000
-	cmdbar.TextWrapped = true
+slaptext.Name = "slap"
+slaptext.Parent = QuickCommands
+slaptext.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+slaptext.BorderColor3 = Color3.fromRGB(0, 0, 0)
+slaptext.BorderSizePixel = 0
+slaptext.Position = UDim2.new(0, 0, 0.590443134, 0)
+slaptext.Size = UDim2.new(1, 0, 0.0906735733, 0)
+slaptext.Font = Enum.Font.SourceSans
+slaptext.Text = "find slap"
+slaptext.TextColor3 = Color3.fromRGB(0, 0, 0)
+slaptext.TextScaled = true
+slaptext.TextSize = 14.000
+slaptext.TextWrapped = true
 
-	flingplus.MouseButton1Click:Connect(function()
-		task.spawn(function()
-			AddLog("[DEBUG] flingplus command active")
-			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
-				CreateTimer(tonumber(delaytext.Text))
+delaytext.Name = "delaytext"
+delaytext.Parent = QuickCommands
+delaytext.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+delaytext.BorderColor3 = Color3.fromRGB(0, 0, 0)
+delaytext.BorderSizePixel = 0
+delaytext.Position = UDim2.new(0, 0,0.505, 0)
+delaytext.Size = UDim2.new(1, 0, 0.0909999982, 0)
+delaytext.ClearTextOnFocus = false
+delaytext.Font = Enum.Font.SourceSans
+delaytext.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+delaytext.PlaceholderText = "enter delay for commands"
+delaytext.Text = ""
+delaytext.TextColor3 = Color3.fromRGB(0, 0, 0)
+delaytext.TextScaled = true
+delaytext.TextSize = 14.000
+delaytext.TextWrapped = true
+
+cmdbar.Name = "cmdbar"
+cmdbar.Parent = SlapLogs
+cmdbar.BackgroundColor3 = Color3.fromRGB(49, 49, 49)
+cmdbar.BorderColor3 = Color3.fromRGB(0, 0, 0)
+cmdbar.BorderSizePixel = 0
+cmdbar.Position = UDim2.new(0.869357884, 0, 0.472873449, 0)
+cmdbar.Size = UDim2.new(0.130642101, 0, 0.13606891, 0)
+cmdbar.ClearTextOnFocus = false
+cmdbar.Font = Enum.Font.SourceSans
+cmdbar.PlaceholderColor3 = Color3.fromRGB(255, 255, 255)
+cmdbar.PlaceholderText = "command bar"
+cmdbar.Text = ""
+cmdbar.TextColor3 = Color3.fromRGB(0, 0, 0)
+cmdbar.TextScaled = true
+cmdbar.TextSize = 14.000
+cmdbar.TextWrapped = true
+
+slaptext.MouseButton1Click:Connect(function()
+	AddLog("Finding Slap")
+	slap = findslap()
+	AddLog("[DEBUG] slap tool location: game."..slap:GetFullName())
+end)
+
+flingplus.MouseButton1Click:Connect(function()
+	task.spawn(function()
+		AddLog("[DEBUG] flingplus command active")
+		if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+			CreateTimer(tonumber(delaytext.Text))
+		end
+		startOrbitCameraAroundRandomPlayer()
+		for _, player in game.Players:GetPlayers() do
+			if player ~= game.Players.LocalPlayer then
+				AddLog("Flinging "..player.Name .. " out of the obby")
+				task.spawn(function()
+					repeat
+						local args = {
+							"slash",
+							player.Character,
+							Vector3.new(math.random(-30,30),30,math.random(-30,30))
+						}
+						task.spawn(function()
+							slap.Event:FireServer(unpack(args))
+						end)
+						task.wait(0.1)
+					until player.Character:WaitForChild("HumanoidRootPart").Position.Y >= 1610
+					task.wait(2)
+					repeat
+						local args = {
+							"slash",
+							player.Character,
+							Vector3.new(100,10,0)
+						}
+						task.spawn(function()
+							slap.Event:FireServer(unpack(args))
+						end)
+						task.wait(0.1)
+					until player.Character:WaitForChild("HumanoidRootPart").Position.X >= 300
+					repeat
+						local args = {
+							"slash",
+							player.Character,
+							Vector3.new(0,10,100)
+						}
+						task.spawn(function()
+							slap.Event:FireServer(unpack(args))
+						end)
+						task.wait(0.1)
+					until player.Character:WaitForChild("HumanoidRootPart").Position.Z >= 300
+					repeat
+						task.wait()
+					until player.Character:WaitForChild("HumanoidRootPart").Position.Y <= 150
+					for i = 1,30 do
+						repeat
+							local args = {
+								"slash",
+								player.Character,
+								Vector3.new(0,50,0)
+							}
+							task.spawn(function()
+								slap.Event:FireServer(unpack(args))
+							end)
+							task.wait(0.1)
+						until player.Character:WaitForChild("HumanoidRootPart").Position.Y >= 300
+						AddLog("Loop (" .. i .. "/30) comepleted! on " .. player.Name)
+					end
+					task.wait(0.05)
+				end)
 			end
-			startOrbitCameraAroundRandomPlayer()
-			for _, player in game.Players:GetPlayers() do
-				if player ~= game.Players.LocalPlayer then
-					AddLog("Flinging "..player.Name .. " out of the obby")
-					task.spawn(function()
-						repeat
-							local args = {
-								"slash",
-								player.Character,
-								Vector3.new(math.random(-30,30),30,math.random(-30,30))
-							}
-							task.spawn(function()
-								slap.Event:FireServer(unpack(args))
-							end)
-							task.wait(0.1)
-						until player.Character:WaitForChild("HumanoidRootPart").Position.Y >= 1610
-						task.wait(2)
-						repeat
-							local args = {
-								"slash",
-								player.Character,
-								Vector3.new(100,10,0)
-							}
-							task.spawn(function()
-								slap.Event:FireServer(unpack(args))
-							end)
-							task.wait(0.1)
-						until player.Character:WaitForChild("HumanoidRootPart").Position.X >= 300
-						repeat
-							local args = {
-								"slash",
-								player.Character,
-								Vector3.new(0,10,100)
-							}
-							task.spawn(function()
-								slap.Event:FireServer(unpack(args))
-							end)
-							task.wait(0.1)
-						until player.Character:WaitForChild("HumanoidRootPart").Position.Z >= 300
-						repeat
-							task.wait()
-						until player.Character:WaitForChild("HumanoidRootPart").Position.Y <= 150
-						for i = 1,30 do
-							repeat
-								local args = {
-									"slash",
-									player.Character,
-									Vector3.new(0,50,0)
-								}
-								task.spawn(function()
-									slap.Event:FireServer(unpack(args))
-								end)
-								task.wait(0.1)
-							until player.Character:WaitForChild("HumanoidRootPart").Position.Y >= 300
-							AddLog("Loop (" .. i .. "/30) comepleted! on " .. player.Name)
-						end
-						task.wait(0.05)
-					end)
-				end
-			end
-			task.wait(40)
-			print("done")
-			stopOrbitCamera()
-		end)
+		end
+		task.wait(40)
+		print("done")
+		stopOrbitCamera()
 	end)
+end)
 
-	nearby.MouseButton1Click:Connect(function()
-		if nearby.Text == "fling nearby players (OFF)" then
-			nearby.Text = "fling nearby players (ON)"
-			isreplitentactive = true
-		else
-			nearby.Text = "fling nearby players (OFF)"
-			isreplitentactive = false
+nearby.MouseButton1Click:Connect(function()
+	if nearby.Text == "fling nearby players (OFF)" then
+		nearby.Text = "fling nearby players (ON)"
+		isreplitentactive = true
+	else
+		nearby.Text = "fling nearby players (OFF)"
+		isreplitentactive = false
+	end
+end)
+
+kill.MouseButton1Click:Connect(function()
+	task.spawn(function()
+		AddLog("[DEBUG] kill command active")
+		if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+			CreateTimer(tonumber(delaytext.Text))
+		end
+		for _, player in game.Players:GetPlayers() do
+			if player ~= game.Players.LocalPlayer then
+				AddLog("Killing "..player.Name)
+				killslap(player)
+				task.wait(0.05)
+			end
 		end
 	end)
+end)
+fling.MouseButton1Click:Connect(function()
+	task.spawn(function()
+		AddLog("[DEBUG] fling command active")
+		if delaytext.Text ~= nil and tonumber(delaytext.Text) then
+			CreateTimer(tonumber(delaytext.Text))
+		end
+		for _, player in game.Players:GetPlayers() do
+			if player ~= game.Players.LocalPlayer then
+				AddLog("Flinging "..player.Name)
+				hit(player)
+				task.wait(0.05)
+			end
+		end
+	end)
+end)
 
-	kill.MouseButton1Click:Connect(function()
-		task.spawn(function()
-			AddLog("[DEBUG] kill command active")
-			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
-				CreateTimer(tonumber(delaytext.Text))
-			end
-			for _, player in game.Players:GetPlayers() do
-				if player ~= game.Players.LocalPlayer then
-					AddLog("Killing "..player.Name)
-					killslap(player)
-					task.wait(0.05)
-				end
-			end
-		end)
-	end)
-	fling.MouseButton1Click:Connect(function()
-		task.spawn(function()
-			AddLog("[DEBUG] fling command active")
-			if delaytext.Text ~= nil and tonumber(delaytext.Text) then
-				CreateTimer(tonumber(delaytext.Text))
-			end
-			for _, player in game.Players:GetPlayers() do
-				if player ~= game.Players.LocalPlayer then
-					AddLog("Flinging "..player.Name)
-					hit(player)
-					task.wait(0.05)
-				end
-			end
-		end)
-	end)
-
-	AddLog("Loaded Succesfully.")
-	AddLog("[DEBUG] slap tool location: game."..slap:GetFullName())
-	game.Players.LocalPlayer.Chatted:Connect(function(msg)
-		ConvertStringToCMD(msg,game.Players.LocalPlayer)
-	end)
-end
+AddLog("Loaded Succesfully.")
+AddLog("[DEBUG] slap tool location: game."..slap:GetFullName())
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	ConvertStringToCMD(msg,game.Players.LocalPlayer)
+end)
 
 cmdbar.FocusLost:Connect(function(enter)
 	if enter then
@@ -1385,3 +1411,25 @@ task.spawn(function()
 	end
 end)
 
+
+-- Updated initialization logic at the end of the script
+task.spawn(function()
+	slap = findslap()
+	if slap ~= nil then
+		QuickCommands.Visible = true
+		AddLog("Script fully loaded and ready.")
+	else
+		AddLog("Script loaded but no slap tool was found.")
+	end
+end)
+
+-- Ensure cmdbar works even if a slap is found later
+cmdbar.FocusLost:Connect(function(enter)
+	if enter then
+		if slap == nil then slap = findslap() end -- Attempt to 'steal' if tool is lost
+		task.spawn(function()
+			ConvertStringToCMD(cmdbar.Text)
+		end)
+		cmdbar.Text = ""
+	end
+end)
