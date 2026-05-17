@@ -93,16 +93,12 @@ task.delay(20, function()
     while task.wait(5) do
         _G.Loaded = true
         if game.PlaceId == 92175551837230 then
-            if success then
                 local decoded = 113382758542299
                 print("Current value2 is:", decoded)
                 if decoded ~= 0 then
                     queue_on_teleport('print("hi") task.wait(3) loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/bot_scripts/bot_in_game.lua"))()')
                     game:GetService("TeleportService"):Teleport(decoded)
                 end
-            else
-                warn("Error fetching value2:", response)
-            end
         end
     end
 ]]
