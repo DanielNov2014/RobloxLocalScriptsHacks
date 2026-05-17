@@ -105,7 +105,7 @@ task.delay(20, function()
    local queuedCode = [[
     if type(queue_on_teleport) ~= "function" then return end
     if _G.Loaded == true then task.wait(math.huge) end
-    while task.wait(20) do
+    while task.wait(5) do
         _G.Loaded = true
         if game.PlaceId == 92175551837230 then
             if success then
