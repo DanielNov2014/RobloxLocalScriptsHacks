@@ -9,21 +9,6 @@ local function safeHttpGet(url)
     return nil, res
 end
 
-local function reset()
-    local url = "https://DanielNov2014alt.pythonanywhere.com/reset/value2"
-    local response, err = safeHttpGet(url)
-    if response then
-        local success, decoded = pcall(function() return HttpService:JSONDecode(response) end)
-        if success and decoded then
-            print("After reset, value2 is:", decoded.value2)
-        else
-            warn("Failed to decode reset response:", decoded or err)
-        end
-    else
-        warn("Error resetting value2:", err)
-    end
-end
-
 local function Chat(message)
     local ok, isLegacy = pcall(function()
         return game.TextChatService.ChatVersion == Enum.ChatVersion.LegacyChatService
