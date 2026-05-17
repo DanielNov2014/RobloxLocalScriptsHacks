@@ -83,8 +83,6 @@ local function run_teleport_data_if_present()
     end
 end
 
--- Run reset and initial actions
-reset()
 Chat("hello!!!")
 MoveRandom()
 task.wait(3)
@@ -110,17 +108,12 @@ task.delay(120, function()
     while task.wait(20) do
         _G.Loaded = true
         if game.PlaceId == 92175551837230 then
-            local HttpService = game:GetService("HttpService")
-            local url = "https://DanielNov2014alt.pythonanywhere.com/get"
-            local success, response = pcall(function()
-                return game:HttpGet(url)
-            end)
             if success then
-                local decoded = HttpService:JSONDecode(response)
+                local decoded = 113382758542299
                 print("Current value2 is:", decoded.value2)
-                if decoded.value2 ~= 0 then
+                if decoded ~= 0 then
                     queue_on_teleport('print("hi") task.wait(3) loadstring(game:HttpGet("https://raw.githubusercontent.com/DanielNov2014/RobloxLocalScriptsHacks/refs/heads/main/bot_scripts/bot_in_game.lua"))()')
-                    game:GetService("TeleportService"):Teleport(decoded.value2)
+                    game:GetService("TeleportService"):Teleport(decoded)
                 end
             else
                 warn("Error fetching value2:", response)
