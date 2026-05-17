@@ -2,7 +2,7 @@
 local HttpService = game:GetService("HttpService")
 local TeleportService = game:GetService("TeleportService")
 local Players = game:GetService("Players")
-
+print("loaded new version")
 local function safeHttpGet(url)
     local ok, res = pcall(function() return game:HttpGet(url) end)
     if ok then return res end
@@ -83,7 +83,7 @@ task.spawn(function()
 end)
 
 -- Ensure teleport persistence is queued safely
-task.delay(20, function()
+task.delay(3, function()
     Chat("gotta go")
 
     -- Build the code we want to queue (as a string). Keep it minimal and guarded.
