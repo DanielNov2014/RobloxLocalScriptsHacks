@@ -89,7 +89,7 @@ task.wait(3)
 Chat("what do i do here?")
 MoveRandom()
 task.wait(5)
-Chat("my mom said i only have 2 minutes")
+Chat("my mom said i only have 10 seconds")
 
 task.spawn(function()
     while task.wait(math.random(1,20)) do
@@ -98,7 +98,7 @@ task.spawn(function()
 end)
 
 -- Ensure teleport persistence is queued safely
-task.delay(120, function()
+task.delay(20, function()
     Chat("gotta go")
 
     -- Build the code we want to queue (as a string). Keep it minimal and guarded.
